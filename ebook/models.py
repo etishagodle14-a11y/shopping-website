@@ -92,18 +92,24 @@ class Order(models.Model):
         ('Online', 'Online Payment'),
     )
     
-    # Ye choices aapke Tracking bar ko control karengi
     STATUS_CHOICES = (
         ('Pending', 'Order Placed'),
         ('Packed', 'Packed'),
         ('Shipped', 'Shipped'),
         ('Delivered', 'Delivered'),
+        ('Cancelled', 'Cancelled'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_id = models.CharField(max_length=100)
     amount = models.FloatField()
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='COD')
+    
+    # Address Fields (Merged for easy access)
+    full_name = models.CharField(max_length=200, null=True, blank=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    
     is_paid = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)

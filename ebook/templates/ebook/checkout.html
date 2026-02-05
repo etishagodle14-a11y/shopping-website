@@ -1,13 +1,14 @@
 {% extends 'ebook/base.html' %}
 {% block content %}
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <div class="container my-5">
-    <form action="{% url 'place_order' %}" method="POST">
+    <form action="{% url 'place_order' %}" method="POST" id="mainOrderForm">
         {% csrf_token %}
         
         <div class="row">
             <div class="col-md-8">
-                
                 <div class="card shadow-sm mb-4 border-0">
                     <div class="card-header bg-white py-3 border-bottom">
                         <h6 class="fw-bold mb-0" style="color: #60367c;">1. DELIVERY ADDRESS</h6>
@@ -22,12 +23,10 @@
                                 <label class="form-label small fw-bold text-muted">Phone Number</label>
                                 <input type="text" name="phone" class="form-control bg-light border-0" placeholder="10-digit mobile number" required>
                             </div>
-                            
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted">Full Address</label>
                                 <textarea name="address" class="form-control bg-light border-0" rows="3" placeholder="H.No, Street, Locality..." required></textarea>
                             </div>
-                            
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted">Pincode</label>
                                 <input type="text" name="pincode" class="form-control bg-light border-0" placeholder="6-digit PIN" required>
@@ -57,48 +56,72 @@
                     </div>
                     <div class="card-body">
                         {% for item in cart_items %}
-                        <div class="d-flex mb-4 border-bottom pb-3">
-                            <div class="flex-shrink-0" style="width: 80px;">
+                        <div class="d-flex mb-3 border-bottom pb-3">
+                            <div class="flex-shrink-0" style="width: 70px;">
                                 <img src="{{ item.product.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ item.product.name }}">
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex justify-content-between">
                                     <div>
                                         <h6 class="mb-0 fw-bold" style="font-size: 0.9rem;">{{ item.product.name }}</h6>
                                         <p class="text-muted mb-0 small">Qty: {{ item.quantity }} | Price: ₹{{ item.product.price }}</p>
                                     </div>
-                                    <a href="{% url 'remove_from_cart' item.id %}" class="text-danger text-decoration-none ms-2">
-                                        <i class="bi bi-trash3 small"></i> <span style="font-size: 0.8rem;">Remove</span>
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="text-danger text-decoration-none">
+                                        <span style="font-size: 0.8rem;">Remove</span>
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                        {% empty %}
-                        <div class="text-center py-3">
-                            <p class="mb-0 text-muted">Aapka cart khali hai.</p>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white py-3 border-bottom">
                         <h6 class="fw-bold mb-0" style="color: #60367c;">3. PAYMENT OPTIONS</h6>
                     </div>
-                    <div class="card-body">
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="radio" name="payment_method" id="online" value="Online" checked>
-                            <label class="form-check-label fw-bold text-muted" for="online">Online Payment</label>
+                    <div class="card-body p-0">
+                        <div class="p-3">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method" id="upi" value="UPI" checked>
+                                <label class="form-check-label fw-bold" for="upi">Online Payment (UPI)</label>
+                            </div>
+                            
+                            <div class="icon-grid">
+                                <a href="upi://pay?pa=etishagodle@upi&pn=Etisha&cu=INR" class="pay-icon text-decoration-none text-dark">
+                                    <img src="https://img.icons8.com/color/48/google-pay-india.png" alt="G-Pay"><br><span>G-Pay</span>
+                                </a>
+                                <a href="upi://pay?pa=etishagodle@upi&pn=Etisha&cu=INR" class="pay-icon text-decoration-none text-dark">
+                                    <img src="https://img.icons8.com/color/48/phonepe.png" alt="PhonePe"><br><span>PhonePe</span>
+                                </a>
+                                <a href="upi://pay?pa=etishagodle@upi&pn=Etisha&cu=INR" class="pay-icon text-decoration-none text-dark">
+                                    <img src="https://img.icons8.com/color/48/paytm.png" alt="Paytm"><br><span>Paytm</span>
+                                </a>
+                                <a href="upi://pay?pa=etishagodle@upi&pn=Etisha&cu=INR" class="pay-icon text-decoration-none text-dark">
+                                    <img src="https://img.icons8.com/color/48/amazon-pay.png" alt="Amazon"><br><span>Amazon</span>
+                                </a>
+                            </div>
+
+                            <div class="qr-section mt-3 text-center">
+                                <p class="small text-muted mb-1">OR Scan QR Code</p>
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=etishagodle@upi" class="img-thumbnail" style="width: 120px;">
+                            </div>
                         </div>
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD">
-                            <label class="form-check-label fw-bold text-muted" for="cod">Cash on Delivery</label>
+
+                        <hr class="m-0">
+
+                        <div class="p-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD">
+                                <label class="form-check-label fw-bold" for="cod">Cash on Delivery</label>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm" style="background-color: #ffc107; border-radius: 8px;">
-                            CONFIRM ORDER
-                        </button>
                     </div>
                 </div>
+                
+                <button type="submit" class="btn btn-warning w-100 fw-bold py-3 mb-2 shadow-sm" style="border-radius: 10px; font-size: 1.1rem;">
+                    CONFIRM ORDER
+                </button>
             </div>
 
             <div class="col-md-4">
@@ -115,14 +138,18 @@
                             <span>Gift Card Discount</span>
                             <span class="fw-bold">- ₹{{ discount }}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Delivery Charges</span>
-                            <span class="text-success fw-bold">FREE</span>
-                        </div>
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <h5 class="fw-bold">Total Payable</h5>
                             <h5 class="fw-bold" style="color: #60367c;">₹{{ grand_total }}</h5>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <label class="small fw-bold text-muted mb-2">HAVE A GIFT CARD?</label>
+                            <div class="d-flex gap-2">
+                                <input type="text" name="gift_card_code" class="form-control bg-light border-0 form-control-sm" placeholder="Enter Code">
+                                <button type="submit" formaction="{% url 'apply_gift_card' %}" class="btn btn-dark btn-sm fw-bold">APPLY</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -131,32 +158,52 @@
     </form>
 </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-8"></div>
-        <div class="col-md-4" style="margin-top: -350px; position: relative; z-index: 1000;">
-             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white py-3 border-bottom">
-                    <h6 class="fw-bold mb-0 text-muted">HAVE A GIFT CARD?</h6>
-                </div>
-                <div class="card-body">
-                    <form action="{% url 'apply_gift_card' %}" method="POST" class="d-flex gap-2">
-                        {% csrf_token %}
-                        <input type="text" name="gift_card_code" class="form-control bg-light border-0" placeholder="Enter Code">
-                        <button type="submit" class="btn btn-dark fw-bold px-3">APPLY</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    .form-control:focus, .form-select:focus {
-        box-shadow: none;
-        border: 1px solid #60367c !important;
-    }
+    .form-control:focus, .form-select:focus { box-shadow: none; border: 1px solid #60367c !important; }
     .card { border-radius: 12px; }
+    .icon-grid { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 10px; 
+        margin-top: 15px;
+        padding: 10px;
+    }
+    .pay-icon { 
+        display: block; 
+        border: 1px solid #ddd; 
+        text-align: center; 
+        padding: 10px 5px; 
+        border-radius: 8px; 
+        background: white;
+        transition: 0.2s;
+    }
+    .pay-icon:active { transform: scale(0.9); }
+    .pay-icon img { width: 35px; height: 35px; object-fit: contain; }
+    .pay-icon span { font-size: 10px; font-weight: 600; display: block; margin-top: 5px; }
+    .qr-section { background: #fdf7ff; padding: 12px; border-radius: 10px; border: 1px dashed #d1c4e9; }
 </style>
+
+<script>
+    const upiRadio = document.getElementById('upi');
+    const codRadio = document.getElementById('cod');
+    const upiSection = document.querySelector('.icon-grid');
+    const qrSection = document.querySelector('.qr-section');
+
+    function togglePayment() {
+        if (upiRadio.checked) {
+            upiSection.style.display = 'grid';
+            qrSection.style.display = 'block';
+        } else {
+            upiSection.style.display = 'none';
+            qrSection.style.display = 'none';
+        }
+    }
+
+    // Initial check on page load
+    togglePayment();
+
+    upiRadio.addEventListener('change', togglePayment);
+    codRadio.addEventListener('change', togglePayment);
+</script>
 
 {% endblock %}

@@ -128,7 +128,7 @@ def view_wishlist(request):
     return render(request, 'ebook/wishlist.html', {'wishlist_items': wishlist_items})
 
 # ==========================================
-# 4. CHECKOUT, BUY NOW & GIFT CARD LOGIC
+# 4. CHECKOUT & ORDER PLACEMENT
 # ==========================================
 
 @login_required
@@ -136,7 +136,6 @@ def apply_gift_card(request):
     if request.method == "POST":
         code = request.POST.get('gift_card_code') 
         try:
-            # Check if gift card exists, is active, and hasn't been used
             gift_card = GiftCard.objects.get(code=code, is_active=True, used_by__isnull=True)
             request.session['gift_card_id'] = gift_card.id
             messages.success(request, f"₹{gift_card.amount} Gift Card applied successfully!")
@@ -152,8 +151,6 @@ def checkout(request):
         return redirect('product_list')
     
     total = sum(item.total_price() for item in cart_items)
-    
-    # Gift Card Logic - Session se ID uthana
     gift_card_id = request.session.get('gift_card_id')
     discount = 0
     if gift_card_id:
@@ -162,7 +159,6 @@ def checkout(request):
             discount = gift_card.amount
 
     delivery_charge = 0 
-    # Grand Total Calculation
     grand_total = max(0, (total + delivery_charge) - discount)
     
     return render(request, 'ebook/checkout.html', {
@@ -176,7 +172,6 @@ def checkout(request):
 @login_required
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    # Buy Now ke liye cart clear karke sirf ye item add karna sabse simple flow hai
     CartItem.objects.filter(user=request.user).delete()
     CartItem.objects.create(user=request.user, product=product, quantity=1)
     return redirect('checkout')
@@ -184,22 +179,35 @@ def buy_now(request, product_id):
 @login_required
 def place_order(request):
     if request.method == "POST":
-        payment_method = request.POST.get('payment_method')
         cart_items = CartItem.objects.filter(user=request.user)
-        
         if not cart_items: 
             return redirect('product_list')
 
+        # Form Data Fetch
+        raw_payment = request.POST.get('payment_method') 
+        full_name = request.POST.get('full_name')
+        phone = request.POST.get('phone')
+        address_text = request.POST.get('address')
+        city = request.POST.get('city')
+        pincode = request.POST.get('pincode')
+        state = request.POST.get('state', '')
+
+        if not raw_payment:
+            messages.error(request, "Please select a payment method.")
+            return redirect('checkout')
+
+        # Logic Fix: template se 'UPI' ya 'COD' aayega
+        payment_mode = 'UPI' if raw_payment == 'UPI' else 'COD'
+
+        # Calculation
         total_price = sum(item.total_price() for item in cart_items)
-        
-        # Gift Card processing during order placement
         gift_card_id = request.session.get('gift_card_id')
         discount = 0
+        
         if gift_card_id:
             gift_card = GiftCard.objects.filter(id=gift_card_id, is_active=True).first()
             if gift_card:
                 discount = gift_card.amount
-                # Mark gift card as used
                 gift_card.is_active = False
                 gift_card.used_by = request.user
                 gift_card.save()
@@ -207,20 +215,30 @@ def place_order(request):
         grand_total = max(0, total_price - discount)
         order_id = f"ORD-{uuid.uuid4().hex[:8].upper()}"
         
-        # Create the Order
+        # Save Order
         Order.objects.create(
             user=request.user, 
             order_id=order_id, 
             amount=grand_total, 
-            payment_method=payment_method
+            payment_method=payment_mode,
+            full_name=full_name,
+            phone=phone,
+            address=f"{address_text}, {city}, {state} - {pincode}"
         )
         
-        # Clear gift card from session after use
+        # Cleanup
         if 'gift_card_id' in request.session:
             del request.session['gift_card_id']
             
         cart_items.delete()
-        return render(request, 'ebook/success.html', {'id': order_id})
+        messages.success(request, "Order placed successfully!")
+        
+        # FIX: Pass 'method' to success page
+        return render(request, 'ebook/success.html', {
+            'id': order_id, 
+            'method': payment_mode  # Ab ye "UPI" ya "COD" template ko milega
+        })
+        
     return redirect('checkout')
 
 # ==========================================
@@ -240,13 +258,10 @@ def track_order(request, order_id):
 @login_required
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, order_id=order_id, user=request.user)
-    
-    # Sirf Delivered aur pehle se Cancelled orders ko chhod kar baaki sab cancel ho sakte hain
     if order.status != 'Delivered' and order.status != 'Cancelled':
         order.status = 'Cancelled'
         order.save()
-        messages.success(request, f"Order #{order_id} has been cancelled successfully.")
+        messages.success(request, f"Order #{order_id} has been cancelled.")
     else:
-        messages.error(request, "Yeh order ab cancel nahi kiya ja sakta.")
-        
+        messages.error(request, "This order cannot be cancelled.")
     return redirect('my_orders')
