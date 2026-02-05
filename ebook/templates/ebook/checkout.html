@@ -1,0 +1,162 @@
+{% extends 'ebook/base.html' %}
+{% block content %}
+
+<div class="container my-5">
+    <form action="{% url 'place_order' %}" method="POST">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-8">
+                
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="fw-bold mb-0" style="color: #60367c;">1. DELIVERY ADDRESS</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Full Name</label>
+                                <input type="text" name="full_name" class="form-control bg-light border-0" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Phone Number</label>
+                                <input type="text" name="phone" class="form-control bg-light border-0" placeholder="10-digit mobile number" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted">Full Address</label>
+                                <textarea name="address" class="form-control bg-light border-0" rows="3" placeholder="H.No, Street, Locality..." required></textarea>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Pincode</label>
+                                <input type="text" name="pincode" class="form-control bg-light border-0" placeholder="6-digit PIN" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">City</label>
+                                <input type="text" name="city" class="form-control bg-light border-0" placeholder="City Name" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">State</label>
+                                <select name="state" class="form-select bg-light border-0" required>
+                                    <option selected disabled value="">--Select--</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="fw-bold mb-0 text-uppercase" style="color: #60367c;">2. ORDER SUMMARY ({{ cart_items|length }} ITEMS)</h6>
+                    </div>
+                    <div class="card-body">
+                        {% for item in cart_items %}
+                        <div class="d-flex mb-4 border-bottom pb-3">
+                            <div class="flex-shrink-0" style="width: 80px;">
+                                <img src="{{ item.product.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ item.product.name }}">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-0 fw-bold" style="font-size: 0.9rem;">{{ item.product.name }}</h6>
+                                        <p class="text-muted mb-0 small">Qty: {{ item.quantity }} | Price: ₹{{ item.product.price }}</p>
+                                    </div>
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="text-danger text-decoration-none ms-2">
+                                        <i class="bi bi-trash3 small"></i> <span style="font-size: 0.8rem;">Remove</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-3">
+                            <p class="mb-0 text-muted">Aapka cart khali hai.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="fw-bold mb-0" style="color: #60367c;">3. PAYMENT OPTIONS</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="online" value="Online" checked>
+                            <label class="form-check-label fw-bold text-muted" for="online">Online Payment</label>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD">
+                            <label class="form-check-label fw-bold text-muted" for="cod">Cash on Delivery</label>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm" style="background-color: #ffc107; border-radius: 8px;">
+                            CONFIRM ORDER
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="fw-bold mb-0 text-muted">PRICE DETAILS</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Price ({{ cart_items|length }} items)</span>
+                            <span>₹{{ total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Gift Card Discount</span>
+                            <span class="fw-bold">- ₹{{ discount }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Delivery Charges</span>
+                            <span class="text-success fw-bold">FREE</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="fw-bold">Total Payable</h5>
+                            <h5 class="fw-bold" style="color: #60367c;">₹{{ grand_total }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8"></div>
+        <div class="col-md-4" style="margin-top: -350px; position: relative; z-index: 1000;">
+             <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h6 class="fw-bold mb-0 text-muted">HAVE A GIFT CARD?</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'apply_gift_card' %}" method="POST" class="d-flex gap-2">
+                        {% csrf_token %}
+                        <input type="text" name="gift_card_code" class="form-control bg-light border-0" placeholder="Enter Code">
+                        <button type="submit" class="btn btn-dark fw-bold px-3">APPLY</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus, .form-select:focus {
+        box-shadow: none;
+        border: 1px solid #60367c !important;
+    }
+    .card { border-radius: 12px; }
+</style>
+
+{% endblock %}

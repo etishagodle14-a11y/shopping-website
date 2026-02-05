@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apna Mart | Your Online Store</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        :root { 
+            --flipkart-blue: #60367cff; 
+            --flipkart-yellow: #d67f14ff; 
+        }
+        
+        /* Navbar Styling */
+        .navbar { background-color: var(--flipkart-blue); padding: 10px 0; }
+        .nav-link { color: #ffffff !important; font-weight: 500; transition: 0.3s; }
+        .nav-link:hover { color: var(--flipkart-yellow) !important; }
+        
+        .login-btn { 
+            background: white; 
+            color: var(--flipkart-blue) !important; 
+            padding: 5px 20px !important; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            display: flex;
+            align-items: center;
+        }
+
+        /* Search Bar Styling */
+        .search-container {
+            border-radius: 4px;
+            overflow: visible; /* Dropdown bahar dikhne ke liye zaroori hai */
+            background: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-search-input {
+            border: none !important;
+            padding: 8px 15px;
+            font-size: 14px;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .nav-icon-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: block;
+            margin-top: -2px;
+        }
+
+        footer { background: #212121; color: white; padding: 40px 0; margin-top: 50px; }
+        
+        /* Dropdown fix for visibility */
+        .dropdown-menu {
+            z-index: 1050 !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container d-flex align-items-center">
+            
+            <a class="navbar-brand text-white fw-bold me-3" href="{% url 'product_list' %}" style="font-size: 24px;">
+                <i>Apna Mart</i>
+            </a>
+
+            <a class="nav-link fw-bold me-2 d-flex align-items-center" href="{% url 'gift_card_list' %}" title="Gift Cards">
+                <i class="bi bi-gift-fill text-warning me-1"></i> 
+                <span class="d-none d-md-inline text-white" style="font-size: 0.9rem;">Gift Cards</span>
+            </a>
+
+            <div class="flex-grow-1 mx-3">
+                <form action="{% url 'product_list' %}" method="GET" class="w-100">
+                    <div class="input-group search-container shadow-sm">
+                        <button class="btn btn-light dropdown-toggle border-end" type="button" data-bs-toggle="dropdown" id="categoryBtn" aria-haspopup="true" aria-expanded="false" style="background-color: #f3f3f3; font-size: 14px; border: none;">
+                            All
+                        </button>
+                        
+                        <ul class="dropdown-menu shadow border-0" aria-labelledby="categoryBtn">
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeCategory('All')">All Categories</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeCategory('Beauty')">Beauty</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeCategory('Electronics')">Electronics</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeCategory('Women')">Women</a></li>
+                        </ul>
+
+                        <input type="text" name="q" class="form-control border-0 custom-search-input" placeholder="Search for products, brands and more" value="{{ request.GET.q|default:'' }}" style="box-shadow: none;">
+                        
+                        <button class="btn btn-white border-0" type="submit" style="color: #60367c; background: white; padding: 0 15px;">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 ms-2">
+                <a class="nav-link text-center px-2" href="{% url 'offer_zone' %}">
+                    <i class="bi bi-lightning-fill text-warning d-block mb-0" style="font-size: 1.1rem;"></i> 
+                    <span class="nav-icon-text">OFFER ZONE</span>
+                </a>
+
+                <a class="nav-link text-center px-2" href="{% url 'my_orders' %}">
+                    <i class="bi bi-box-seam d-block mb-0" style="font-size: 1.1rem;"></i>
+                    <span class="nav-icon-text">My Orders</span>
+                </a>
+
+                <a class="nav-link text-center px-2 position-relative" href="{% url 'view_wishlist' %}">
+                    <i class="bi bi-heart-fill d-block mb-0" style="font-size: 1.1rem;"></i>
+                    <span class="nav-icon-text">Wishlist</span>
+                    {% if wishlist_items.count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ wishlist_items.count }}
+                        </span>
+                    {% endif %}
+                </a>
+
+                <a class="nav-link text-center px-2 position-relative" href="{% url 'view_cart' %}">
+                    <i class="bi bi-cart-fill d-block mb-0" style="font-size: 1.1rem;"></i>
+                    <span class="nav-icon-text">Cart</span>
+                    {% if cart_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ cart_count }}
+                        </span>
+                    {% endif %}
+                </a>
+
+                {% if user.is_authenticated %}
+                    <div class="dropdown ms-2">
+                        <a class="nav-link dropdown-toggle login-btn shadow-sm" href="#" role="button" data-bs-toggle="dropdown">
+                             <i class="bi bi-person-circle me-1"></i> {{ user.username|title }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li><a class="dropdown-item py-2" href="{% url 'my_orders' %}"><i class="bi bi-box-seam me-2"></i> My Orders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i class="bi bi-power me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="nav-link login-btn shadow-sm ms-2" href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="py-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <p class="small text-muted mb-0">&copy; 2026 Apna Mart. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function changeCategory(name) {
+            document.getElementById('categoryBtn').innerText = name;
+        }
+    </script>
+</body>
+</html>

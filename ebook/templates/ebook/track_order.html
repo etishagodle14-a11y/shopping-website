@@ -1,0 +1,149 @@
+{% extends 'ebook/base.html' %}
+
+{% block content %}
+<style>
+    /* Horizontal Tracking Timeline */
+    .track-container-main {
+        padding: 40px 0;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+    }
+    .track-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+    }
+    .track-step::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: -50%;
+        width: 100%;
+        height: 4px;
+        background: #ddd;
+        z-index: 1;
+        transition: 0.3s ease;
+    }
+    .track-step:first-child::before { display: none; }
+    
+    .track-icon {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        border-radius: 50%;
+        background: #ddd;
+        color: white;
+        display: inline-block;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 2;
+        font-size: 1.2rem;
+    }
+    
+    /* Active State (Brand Color) */
+    .track-step.active .track-icon { 
+        background: #60367c; /* Aapka Theme Color */
+        box-shadow: 0 0 10px rgba(96, 54, 124, 0.4);
+    }
+    .track-step.active::before { background: #60367c; }
+    .track-step.active .track-text { color: #60367c; font-weight: bold; }
+
+    .track-text { color: #6c757d; transition: 0.3s ease; }
+    body { background-color: #f1f3f6; }
+</style>
+
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm border-0 rounded-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">Track Order: <span class="text-primary">#{{ order.order_id }}</span></h5>
+            <span class="badge {% if order.status == 'Delivered' %}bg-success{% else %}bg-info{% endif %} px-3 py-2">
+                {{ order.status }}
+            </span>
+        </div>
+        <div class="card-body px-md-5">
+            <div class="track-container-main">
+                <div class="track-step active">
+                    <span class="track-icon"><i class="bi bi-cart-check"></i></span>
+                    <p class="track-text small mb-0">Order Placed</p>
+                    <small class="text-muted">{{ order.created_at|date:"d M" }}</small>
+                </div>
+
+                <div class="track-step {% if order.status != 'Pending' %}active{% endif %}">
+                    <span class="track-icon"><i class="bi bi-box-seam"></i></span>
+                    <p class="track-text small mb-0">Packed</p>
+                </div>
+
+                <div class="track-step {% if order.status == 'Shipped' or order.status == 'Delivered' %}active{% endif %}">
+                    <span class="track-icon"><i class="bi bi-truck"></i></span>
+                    <p class="track-text small mb-0">Shipped</p>
+                </div>
+
+                <div class="track-step {% if order.status == 'Delivered' %}active{% endif %}">
+                    <span class="track-icon"><i class="bi bi-house-check"></i></span>
+                    <p class="track-text small mb-0">Delivered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 rounded-0 mb-4 h-100">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Delivery Address</h6>
+                    <h5 class="fw-bold mb-1">{{ request.user.username|title }}</h5>
+                    <p class="text-dark">
+                        {{ order.address|default:"Address not provided" }}<br>
+                        <strong>Phone:</strong> {{ order.phone|default:"N/A" }}
+                    </p>
+                    <hr>
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Order Items</h6>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="p-3 bg-light border me-3">
+                            <i class="bi bi-journal-text fs-2" style="color: #60367c;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">E-Book/Product Package</h6>
+                            <p class="small text-muted mb-0">Quantity: 1 | Method: {{ order.payment_method }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 rounded-0 h-100">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-4">Payment Summary</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span class="fw-bold">₹{{ order.amount }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping Fee</span>
+                        <span class="text-success fw-bold">FREE</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="h5 fw-bold">Total Amount</span>
+                        <span class="h4 fw-bold text-primary">₹{{ order.amount }}</span>
+                    </div>
+                    
+                    <div class="alert {% if order.is_paid %}alert-success{% else %}alert-warning{% endif %} rounded-0 py-2">
+                        <i class="bi {% if order.is_paid %}bi-patch-check-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
+                        Payment Status: <strong>{% if order.is_paid %}Paid{% else %}Pending{% endif %}</strong>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'my_orders' %}" class="btn btn-outline-dark rounded-0">
+                            <i class="bi bi-arrow-left me-2"></i> Back to My Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

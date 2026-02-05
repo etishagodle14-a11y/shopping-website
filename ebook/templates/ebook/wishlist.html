@@ -1,0 +1,114 @@
+{% extends 'ebook/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'product_list' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active">My Wishlist</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold mb-4"><i class="bi bi-heart-fill text-danger me-2"></i> My Wishlist ({{ wishlist_items.count }})</h3>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for item in wishlist_items %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm product-card position-relative">
+                <a href="{% url 'toggle_wishlist' item.product.id %}" class="btn-remove-wishlist shadow-sm" title="Remove from wishlist">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+
+                <a href="{% url 'product_detail' item.product.id %}" class="text-decoration-none">
+                    <div class="wishlist-img-wrapper p-3">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" class="img-fluid" alt="{{ item.product.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/200" class="img-fluid" alt="No image">
+                        {% endif %}
+                    </div>
+                </a>
+
+                <div class="card-body text-center pt-0">
+                    <h6 class="text-truncate fw-bold mb-1">{{ item.product.name }}</h6>
+                    <p class="text-success fw-bold mb-2">₹{{ item.product.price }}</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'add_to_cart' item.product.id %}" class="btn btn-primary btn-sm rounded-1">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="mb-4">
+                <i class="bi bi-heartbreak display-1 text-muted"></i>
+            </div>
+            <h4 class="text-muted">Aapki wishlist khali hai!</h4>
+            <p class="text-muted mb-4">Kuch pasandida products save karein.</p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary px-5">Continue Shopping</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* Wishlist Specific Styling */
+    .wishlist-img-wrapper {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .wishlist-img-wrapper img {
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    .product-card:hover .wishlist-img-wrapper img {
+        transform: scale(1.08);
+    }
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Remove Button Styling */
+    .btn-remove-wishlist {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+        background: white;
+        color: #ff4757;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        border: 1px solid #eee;
+    }
+    .btn-remove-wishlist:hover {
+        background: #ff4757;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .wishlist-img-wrapper { height: 140px; }
+    }
+</style>
+{% endblock %}

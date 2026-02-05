@@ -1,0 +1,29 @@
+<div class="container text-center">
+    <h2>Complete Your Purchase</h2>
+    <p>Amount to pay: ₹50,000</p>
+    
+    <button id="pay-btn" class="btn btn-success btn-lg">Pay with Razorpay</button>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key }}", 
+        "amount": "{{ amount }}", 
+        "currency": "INR",
+        "name": "Mobile Store",
+        "description": "Buying New Mobile",
+        "order_id": "{{ order_id }}", 
+        "handler": function (response){
+            alert("Payment Successful! ID: " + response.razorpay_payment_id);
+            // Payment success hone ke baad user ko success page par bhej dein
+            window.location.href = "/payment-success/";
+        },
+        "theme": { "color": "#60367cff" }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('pay-btn').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>

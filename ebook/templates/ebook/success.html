@@ -1,0 +1,104 @@
+{% extends 'ebook/base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-0 text-center p-4 p-md-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success animate-check" style="font-size: 5rem;"></i>
+                </div>
+                
+                <h2 class="fw-bold mb-3 text-dark">Order Placed Successfully!</h2>
+                <p class="text-muted">Thank you, <strong class="text-dark">{{ request.user.username }}</strong>. Your order has been received and is being processed.</p>
+                
+                <hr class="my-4">
+
+                <div class="bg-light p-3 mb-4 rounded text-start">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small text-uppercase fw-bold">Order ID:</span>
+                        <span class="fw-bold text-primary">{{ id }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small text-uppercase fw-bold">Payment Method:</span>
+                        <span class="fw-bold">{{ method|default:"Not Specified" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small text-uppercase fw-bold">Status:</span>
+                        <span class="badge bg-warning text-dark">Pending Verification</span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="{% url 'my_orders' %}" class="btn btn-lg rounded-0 fw-bold text-white" style="background-color: #60367cff;">
+                        <i class="bi bi-bag-check me-2"></i> VIEW MY ORDERS
+                    </a>
+                    <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-0 fw-bold">
+                        CONTINUE SHOPPING
+                    </a>
+                </div>
+                
+                <p class="mt-4 small text-muted">A confirmation email/message will be sent to you shortly.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #f1f3f6; }
+    
+    /* Animation for the check icon */
+    .animate-check {
+        display: inline-block;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .card {
+        border-top: 4px solid #60367cff !important; 
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    window.onload = function() {
+        // Center splash
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff']
+        });
+
+        // Continuous celebration for 3 seconds
+        var duration = 3 * 1000;
+        var end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#60367c', '#a25afd']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#26ccff', '#ff5e7e']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+    };
+</script>
+{% endblock %}
