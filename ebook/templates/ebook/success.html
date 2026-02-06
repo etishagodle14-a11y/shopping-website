@@ -44,6 +44,20 @@
                     </div>
                 </div>
 
+                {% if method == 'UPI' %}
+                    <div class="mb-4" style="background-color: #f8f9fa; padding: 20px; border: 2px dashed #28a745; border-radius: 10px; text-align: center;">
+                        <h4 style="color: #28a745; font-weight: bold;"><i class="bi bi-upc-scan me-2"></i>Payment Required</h4>
+                        <p class="mb-2">Aapka order receive ho gaya hai. Delivery confirm karne ke liye niche di gayi ID par payment karein:</p>
+                        <div class="p-2 mb-2" style="background: #fff; border: 1px solid #ddd; display: inline-block; border-radius: 5px;">
+                            <h3 style="font-weight: bold; color: #333; margin-bottom: 0;">yourname@upi</h3> </div>
+                        <p class="small text-muted mt-2">Payment ke baad <strong>Order ID #{{ id }}</strong> ka screenshot WhatsApp par zaroor bhejein.</p>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info border-0 rounded-0 mb-4">
+                        <i class="bi bi-info-circle me-2"></i> Aapka order <strong>Cash on Delivery (COD)</strong> ke liye confirm ho gaya hai.
+                    </div>
+                {% endif %}
+
                 <div class="d-grid gap-2">
                     <a href="{% url 'my_orders' %}" class="btn btn-lg rounded-0 fw-bold text-white" style="background-color: #60367cff;">
                         <i class="bi bi-bag-check me-2"></i> VIEW MY ORDERS
@@ -62,7 +76,6 @@
 <style>
     body { background-color: #f1f3f6; }
     
-    /* Animation for the check icon */
     .animate-check {
         display: inline-block;
         animation: scaleIn 0.5s ease-out;
@@ -80,10 +93,8 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
 <script>
     window.onload = function() {
-        // Initial big splash
         confetti({
             particleCount: 150,
             spread: 70,
@@ -91,7 +102,6 @@
             colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff']
         });
 
-        // Continuous side celebration for 3 seconds
         var duration = 3 * 1000;
         var end = Date.now() + duration;
 
@@ -108,7 +118,7 @@
                 angle: 120,
                 spread: 55,
                 origin: { x: 1 },
-                colors: ['#26ccff', '#ff5e7e']
+                colors: ['#f253a8ff', '#d868f1ff']
             });
 
             if (Date.now() < end) {
