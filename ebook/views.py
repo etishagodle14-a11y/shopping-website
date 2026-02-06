@@ -45,15 +45,15 @@ def product_detail(request, id):
     product = get_object_or_404(Product, id=id)
     return render(request, 'ebook/details.html', {'product': product})
 
-# 2. AUTHENTICATION VIEWS
+# 2. AUTHENTICATION VIEWS (Fixed Redirects & Names)
 def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-            messages.success(request, "Registration successful!")
-            return redirect('product_list')
+            # login(request, user) # Optional: Signup ke baad seedha login
+            messages.success(request, "Registration successful! Please Login.")
+            return redirect('login') # Fixed to 'login'
     else:
         form = UserCreationForm()
     return render(request, 'ebook/signup.html', {'form': form})
@@ -71,7 +71,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('product_list')
+    return redirect('login') # Fixed to 'login'
 
 # 3. CART & WISHLIST
 def add_to_cart(request, product_id):
@@ -109,11 +109,10 @@ def view_wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'ebook/wishlist.html', {'wishlist_items': wishlist_items})
 
-# 4. CHECKOUT & BUY NOW
+# 4. CHECKOUT & PLACE ORDER
 @login_required
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    # Important: Mobile users ke liye session clear karke fresh cart item create karna
     CartItem.objects.filter(user=request.user).delete()
     CartItem.objects.create(user=request.user, product=product, quantity=1)
     return redirect('checkout')
@@ -149,7 +148,6 @@ def place_order(request):
             return redirect('product_list')
 
         total_price = sum(item.total_price() for item in cart_items)
-        # Gift Card Logic Apply
         gift_card_id = request.session.get('gift_card_id')
         discount = 0
         if gift_card_id:
@@ -160,12 +158,15 @@ def place_order(request):
                 gift_card.used_by = request.user
                 gift_card.save()
 
+        final_amount = max(0, total_price - discount)
         order_id = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        payment_mode = request.POST.get('payment_method', 'COD')
+
         Order.objects.create(
             user=request.user, 
             order_id=order_id, 
-            amount=max(0, total_price - discount), 
-            payment_method=request.POST.get('payment_method', 'COD'),
+            amount=final_amount, 
+            payment_method=payment_mode,
             full_name=request.POST.get('full_name'),
             phone=request.POST.get('phone'),
             address=f"{request.POST.get('address')}, {request.POST.get('city')} - {request.POST.get('pincode')}"
@@ -175,7 +176,12 @@ def place_order(request):
         if 'gift_card_id' in request.session:
             del request.session['gift_card_id']
         
-        return render(request, 'ebook/success.html', {'id': order_id})
+        # Passing extra context for success.html (amount & method)
+        return render(request, 'ebook/success.html', {
+            'id': order_id,
+            'amount': final_amount,
+            'method': payment_mode
+        })
     return redirect('checkout')
 
 # 5. ORDER TRACKING & EXTRAS
