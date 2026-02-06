@@ -8,10 +8,10 @@ urlpatterns = [
     path('product/<int:id>/', views.product_detail, name='product_detail'),
     path('offer-zone/', views.offer_zone, name='offer_zone'),
     
-    # --- Authentication (IMPORTANT: Inke names templates se match hone chahiye) ---
-    path('signup/', views.signup_view, name='signup_view'),
-    path('login/', views.login_view, name='login_view'),   # Maine 'login' ko 'login_view' kar diya hai
-    path('logout/', views.logout_view, name='logout_view'),
+    # --- Authentication (Standard Names) ---
+    path('signup/', views.signup_view, name='signup'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
     
     # --- Cart & Wishlist ---
     path('cart/', views.view_cart, name='view_cart'),

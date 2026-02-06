@@ -131,6 +131,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Ye line extra add karein
 # Media configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# settings.py ke sabse niche
+LOGIN_URL = 'login'
 
 
 # Razorpay Credentials

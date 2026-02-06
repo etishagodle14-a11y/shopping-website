@@ -105,7 +105,7 @@
 
                             <div class="qr-section mt-3 text-center" id="qrInstruction">
                                 <p class="small text-muted mb-1">Select an app or Scan the QR below</p>
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=etishagodle@upi&pn=ApnaMart&am={{ grand_total }}&cu=INR" class="img-thumbnail" style="width: 120px;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ grand_total }}&cu=INR" class="img-thumbnail" style="width: 120px;">
                             </div>
                         </div>
 
@@ -167,7 +167,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=etishagodle@upi&pn=ApnaMart&am={{ grand_total }}&cu=INR" class="img-fluid shadow-sm rounded mb-3" style="max-width: 200px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ grand_total }}&cu=INR" class="img-fluid shadow-sm rounded mb-3" style="max-width: 200px;">
                 <p class="mb-1 fw-bold text-muted">Amount: ₹{{ grand_total }}</p>
                 <p class="small text-muted">Open any UPI app (GPay, PhonePe, etc.) and scan this code.</p>
             </div>
@@ -225,23 +225,17 @@
     codRadio.addEventListener('change', togglePayment);
 
     function handlePayment(appName) {
-        // Change 'etishagodle@upi' to your actual UPI ID
         const upiID = "krishugodle@oksbi"; 
         const name = "Apna Mart";
-        const amount = "{{ grand_total }}";
+        let amount = parseFloat("{{ grand_total }}").toFixed(2);
         const note = "Order Payment Apna Mart";
         
-        // Final UPI Deep Link
         const upiUrl = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
-
-        // Device detection
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const isMobile = /Android|iPod|iPhone|iPad/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // Mobile: Directly open UPI App
             window.location.href = upiUrl;
         } else {
-            // Laptop: Show QR Code Modal
             document.getElementById('selectedApp').innerText = appName;
             var myModal = new bootstrap.Modal(document.getElementById('qrModal'));
             myModal.show();
@@ -250,5 +244,4 @@
     
     togglePayment();
 </script>
-
 {% endblock %}
