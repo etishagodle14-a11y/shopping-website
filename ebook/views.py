@@ -56,7 +56,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             messages.success(request, "Registration successful! Please Login.")
-            return redirect('login')  # Must match name='login' in urls.py
+            return redirect('login')
     else:
         form = UserCreationForm()
     return render(request, 'ebook/signup.html', {'form': form})
@@ -67,16 +67,16 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            # Redirect to intended page or home
             return redirect(request.GET.get('next', 'product_list'))
     else:
         form = AuthenticationForm()
     return render(request, 'ebook/login.html', {'form': form})
 
+# UPDATED: Ab logout ke baad user Home Page (product_list) par jayega
 def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully.")
-    return redirect('login')
+    return redirect('product_list') 
 
 # ==========================================
 # 3. CART & WISHLIST
@@ -122,7 +122,6 @@ def view_wishlist(request):
 @login_required
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    # Clear existing cart and add only this item for buy now
     CartItem.objects.filter(user=request.user).delete()
     CartItem.objects.create(user=request.user, product=product, quantity=1)
     return redirect('checkout')
