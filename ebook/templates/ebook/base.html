@@ -28,12 +28,13 @@
             font-weight: bold; 
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
 
         /* Search Bar Styling */
         .search-container {
             border-radius: 4px;
-            overflow: visible; /* Dropdown bahar dikhne ke liye zaroori hai */
+            overflow: visible;
             background: white;
             display: flex;
             align-items: center;
@@ -56,7 +57,6 @@
 
         footer { background: #212121; color: white; padding: 40px 0; margin-top: 50px; }
         
-        /* Dropdown fix for visibility */
         .dropdown-menu {
             z-index: 1050 !important;
         }
@@ -79,7 +79,7 @@
             <div class="flex-grow-1 mx-3">
                 <form action="{% url 'product_list' %}" method="GET" class="w-100">
                     <div class="input-group search-container shadow-sm">
-                        <button class="btn btn-light dropdown-toggle border-end" type="button" data-bs-toggle="dropdown" id="categoryBtn" aria-haspopup="true" aria-expanded="false" style="background-color: #f3f3f3; font-size: 14px; border: none;">
+                        <button class="btn btn-light dropdown-toggle border-end" type="button" data-bs-toggle="dropdown" id="categoryBtn" style="background-color: #f3f3f3; font-size: 14px; border: none;">
                             All
                         </button>
                         
@@ -90,7 +90,7 @@
                             <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeCategory('Women')">Women</a></li>
                         </ul>
 
-                        <input type="text" name="q" class="form-control border-0 custom-search-input" placeholder="Search for products, brands and more" value="{{ request.GET.q|default:'' }}" style="box-shadow: none;">
+                        <input type="text" name="q" class="form-control border-0 custom-search-input" placeholder="Search for products, brands and more" value="{{ request.GET.q|default:'' }}">
                         
                         <button class="btn btn-white border-0" type="submit" style="color: #60367c; background: white; padding: 0 15px;">
                             <i class="bi bi-search"></i>
@@ -113,21 +113,11 @@
                 <a class="nav-link text-center px-2 position-relative" href="{% url 'view_wishlist' %}">
                     <i class="bi bi-heart-fill d-block mb-0" style="font-size: 1.1rem;"></i>
                     <span class="nav-icon-text">Wishlist</span>
-                    {% if wishlist_items.count > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ wishlist_items.count }}
-                        </span>
-                    {% endif %}
                 </a>
 
                 <a class="nav-link text-center px-2 position-relative" href="{% url 'view_cart' %}">
                     <i class="bi bi-cart-fill d-block mb-0" style="font-size: 1.1rem;"></i>
                     <span class="nav-icon-text">Cart</span>
-                    {% if cart_count > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ cart_count }}
-                        </span>
-                    {% endif %}
                 </a>
 
                 {% if user.is_authenticated %}
@@ -138,11 +128,11 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                             <li><a class="dropdown-item py-2" href="{% url 'my_orders' %}"><i class="bi bi-box-seam me-2"></i> My Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i class="bi bi-power me-2"></i> Logout</a></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="{% url 'logout_view' %}"><i class="bi bi-power me-2"></i> Logout</a></li>
                         </ul>
                     </div>
                 {% else %}
-                    <a class="nav-link login-btn shadow-sm ms-2" href="{% url 'login' %}">Login</a>
+                    <a class="login-btn shadow-sm ms-2" href="{% url 'login_view' %}">Login</a>
                 {% endif %}
             </div>
         </div>

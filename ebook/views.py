@@ -2,7 +2,7 @@ import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm  # Signup form added
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Product, Category, CartItem, Order, Wishlist, GiftCard, Slider 
@@ -63,8 +63,20 @@ def offer_zone(request):
     return render(request, 'ebook/offer_zone.html', {'products': products})
 
 # ==========================================
-# 2. AUTHENTICATION VIEWS
+# 2. AUTHENTICATION VIEWS (LOGIN, LOGOUT, SIGNUP)
 # ==========================================
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user) # Signup hote hi login ho jaye
+            messages.success(request, "Registration successful! Welcome to our shop.")
+            return redirect('product_list')
+    else:
+        form = UserCreationForm()
+    return render(request, 'ebook/signup.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -196,7 +208,6 @@ def place_order(request):
             messages.error(request, "Please select a payment method.")
             return redirect('checkout')
 
-        # Logic Fix: template se 'UPI' ya 'COD' aayega
         payment_mode = 'UPI' if raw_payment == 'UPI' else 'COD'
 
         # Calculation
@@ -233,10 +244,9 @@ def place_order(request):
         cart_items.delete()
         messages.success(request, "Order placed successfully!")
         
-        # FIX: Pass 'method' to success page
         return render(request, 'ebook/success.html', {
             'id': order_id, 
-            'method': payment_mode  # Ab ye "UPI" ya "COD" template ko milega
+            'method': payment_mode 
         })
         
     return redirect('checkout')

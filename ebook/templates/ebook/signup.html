@@ -1,0 +1,69 @@
+{% extends 'ebook/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0 p-4" style="border-radius: 15px;">
+                <h3 class="text-center fw-bold mb-4" style="color: #60367c;">Create Account</h3>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" style="color: #555;">{{ field.label }}</label>
+                            {{ field }}
+                            
+                            {% if field.help_text %}
+                                <small class="text-muted d-block" style="font-size: 0.8rem; line-height: 1.2;">
+                                    {{ field.help_text }}
+                                </small>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn text-white fw-bold" style="background-color: #60367c; padding: 10px;">
+                            SIGN UP
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-center mt-3 small">
+                    Already have an account? <a href="{% url 'login_view' %}" class="text-decoration-none fw-bold" style="color: #60367c;">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Django form fields ko Bootstrap jaisa dikhane ke liye custom CSS */
+    input { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid #ddd; 
+        border-radius: 5px; 
+        margin-bottom: 5px;
+        outline: none;
+    }
+    
+    input:focus {
+        border-color: #60367c;
+        box-shadow: 0 0 5px rgba(96, 54, 124, 0.2);
+    }
+
+    /* Help text ke list bullets hatane ke liye (Django default) */
+    ul.helptext {
+        list-style-type: none;
+        padding-left: 0;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
