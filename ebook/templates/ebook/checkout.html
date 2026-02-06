@@ -206,7 +206,6 @@
 </style>
 
 <script>
-    // 1. Logic for Radio Buttons Toggle
     const upiRadio = document.getElementById('upi');
     const codRadio = document.getElementById('cod');
     const upiSection = document.getElementById('upiIcons');
@@ -225,30 +224,30 @@
     upiRadio.addEventListener('change', togglePayment);
     codRadio.addEventListener('change', togglePayment);
 
-    // 2. Logic for Laptop vs Mobile Payment
     function handlePayment(appName) {
-        const amount = "{{ grand_total }}";
+        // Change 'etishagodle@upi' to your actual UPI ID
         const upiID = "etishagodle@upi"; 
         const name = "Apna Mart";
+        const amount = "{{ grand_total }}";
+        const note = "Order Payment Apna Mart";
         
-        // UPI Intent URL for Mobile Apps
-        const upiUrl = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+        // Final UPI Deep Link
+        const upiUrl = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
 
-        // Check Device
+        // Device detection
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // Mobile par app kholne ki koshish karein
+            // Mobile: Directly open UPI App
             window.location.href = upiUrl;
         } else {
-            // Laptop par QR Modal dikhayein
+            // Laptop: Show QR Code Modal
             document.getElementById('selectedApp').innerText = appName;
             var myModal = new bootstrap.Modal(document.getElementById('qrModal'));
             myModal.show();
         }
     }
     
-    // Check toggle on load
     togglePayment();
 </script>
 
