@@ -8,7 +8,9 @@ from django.contrib import messages
 from .models import Product, Category, CartItem, Order, Wishlist, GiftCard, Slider 
 from django.db.models import Q 
 
+# ==========================================
 # 1. PRODUCT & SHOP VIEWS
+# ==========================================
 def product_list(request):
     query = request.GET.get('q', '').strip()
     category_name = request.GET.get('category')
@@ -45,15 +47,16 @@ def product_detail(request, id):
     product = get_object_or_404(Product, id=id)
     return render(request, 'ebook/details.html', {'product': product})
 
-# 2. AUTHENTICATION VIEWS (Fixed Redirects & Names)
+# ==========================================
+# 2. AUTHENTICATION VIEWS (Fixed Names)
+# ==========================================
 def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # login(request, user) # Optional: Signup ke baad seedha login
             messages.success(request, "Registration successful! Please Login.")
-            return redirect('login') # Fixed to 'login'
+            return redirect('login')  # Matches urls.py name='login'
     else:
         form = UserCreationForm()
     return render(request, 'ebook/signup.html', {'form': form})
@@ -71,9 +74,11 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login') # Fixed to 'login'
+    return redirect('login')  # Matches urls.py name='login'
 
+# ==========================================
 # 3. CART & WISHLIST
+# ==========================================
 def add_to_cart(request, product_id):
     if not request.user.is_authenticated:
         messages.info(request, "Please login first.")
@@ -109,7 +114,9 @@ def view_wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'ebook/wishlist.html', {'wishlist_items': wishlist_items})
 
+# ==========================================
 # 4. CHECKOUT & PLACE ORDER
+# ==========================================
 @login_required
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -176,7 +183,6 @@ def place_order(request):
         if 'gift_card_id' in request.session:
             del request.session['gift_card_id']
         
-        # Passing extra context for success.html (amount & method)
         return render(request, 'ebook/success.html', {
             'id': order_id,
             'amount': final_amount,
@@ -184,7 +190,9 @@ def place_order(request):
         })
     return redirect('checkout')
 
+# ==========================================
 # 5. ORDER TRACKING & EXTRAS
+# ==========================================
 @login_required
 def my_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-id') 

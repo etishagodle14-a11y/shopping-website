@@ -8,7 +8,7 @@ urlpatterns = [
     path('product/<int:id>/', views.product_detail, name='product_detail'),
     path('offer-zone/', views.offer_zone, name='offer_zone'),
     
-    # --- Authentication (Note: name='login' is standard) ---
+    # --- Authentication (Standardized Names) ---
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
