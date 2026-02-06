@@ -99,8 +99,8 @@
         position: absolute;
         top: 10px;
         left: -30px;
-        background: #60367cff;
-        color: #000;
+        background: #d67f14ff; /* Changed to match theme */
+        color: #fff;
         padding: 5px 35px;
         font-size: 10px;
         font-weight: bold;
@@ -118,27 +118,51 @@
 </style>
 
 <script>
-    // Offer Zone Countdown Timer
-    function startOfferTimer(duration, display) {
-        var timer = duration, hours, minutes, seconds;
-        setInterval(function () {
-            hours = Math.floor(timer / 3600);
-            minutes = Math.floor((timer % 3600) / 60);
-            seconds = Math.floor(timer % 60);
+    // Persistent Countdown Timer
+    function startOfferTimer(display) {
+        const duration = 24 * 60 * 60; // 24 Hours in seconds
+        let now = Math.floor(Date.now() / 1000);
+        
+        // Browser ki memory (localStorage) se end time uthao
+        let offerEndTime = localStorage.getItem('offer_end_time');
 
-            display.textContent = (hours < 10 ? "0" + hours : hours) + "h " + 
-                                  (minutes < 10 ? "0" + minutes : minutes) + "m " + 
-                                  (seconds < 10 ? "0" + seconds : seconds) + "s";
+        // Agar memory khali hai ya purana timer khatam ho gaya hai, naya set karo
+        if (!offerEndTime || now > offerEndTime) {
+            offerEndTime = now + duration;
+            localStorage.setItem('offer_end_time', offerEndTime);
+        }
 
-            if (--timer < 0) { timer = duration; }
-        }, 1000);
+        function updateDisplay() {
+            let currentTime = Math.floor(Date.now() / 1000);
+            let remainingTime = offerEndTime - currentTime;
+
+            if (remainingTime <= 0) {
+                // Timer khatam hone par reset ya message
+                display.textContent = "00h 00m 00s";
+                // Optionally: yahan naya 24h timer shuru kar sakte hain
+                // localStorage.setItem('offer_end_time', currentTime + duration);
+                return;
+            }
+
+            let h = Math.floor(remainingTime / 3600);
+            let m = Math.floor((remainingTime % 3600) / 60);
+            let s = Math.floor(remainingTime % 60);
+
+            display.textContent = 
+                (h < 10 ? "0" + h : h) + "h " + 
+                (m < 10 ? "0" + m : m) + "m " + 
+                (s < 10 ? "0" + s : s) + "s";
+        }
+
+        // Har second update karo
+        updateDisplay();
+        setInterval(updateDisplay, 1000);
     }
 
     window.onload = function () {
         var display = document.querySelector('#offer-timer');
         if(display) {
-            // Timer set for 24 hours (86400 seconds)
-            startOfferTimer(86400, display);
+            startOfferTimer(display);
         }
     };
 </script>
