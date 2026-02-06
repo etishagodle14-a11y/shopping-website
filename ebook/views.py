@@ -48,7 +48,7 @@ def product_detail(request, id):
     return render(request, 'ebook/details.html', {'product': product})
 
 # ==========================================
-# 2. AUTHENTICATION VIEWS (Fixed Names)
+# 2. AUTHENTICATION VIEWS
 # ==========================================
 def signup_view(request):
     if request.method == 'POST':
@@ -56,7 +56,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             messages.success(request, "Registration successful! Please Login.")
-            return redirect('login')  # Matches urls.py name='login'
+            return redirect('login')  # Must match name='login' in urls.py
     else:
         form = UserCreationForm()
     return render(request, 'ebook/signup.html', {'form': form})
@@ -67,6 +67,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            # Redirect to intended page or home
             return redirect(request.GET.get('next', 'product_list'))
     else:
         form = AuthenticationForm()
@@ -74,14 +75,15 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')  # Matches urls.py name='login'
+    messages.success(request, "Logged out successfully.")
+    return redirect('login')
 
 # ==========================================
 # 3. CART & WISHLIST
 # ==========================================
 def add_to_cart(request, product_id):
     if not request.user.is_authenticated:
-        messages.info(request, "Please login first.")
+        messages.info(request, "Please login first to add items to cart.")
         return redirect('login')
     product = get_object_or_404(Product, id=product_id)
     cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
@@ -120,6 +122,7 @@ def view_wishlist(request):
 @login_required
 def buy_now(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+    # Clear existing cart and add only this item for buy now
     CartItem.objects.filter(user=request.user).delete()
     CartItem.objects.create(user=request.user, product=product, quantity=1)
     return redirect('checkout')
@@ -209,6 +212,7 @@ def cancel_order(request, order_id):
     if order.status not in ['Delivered', 'Cancelled']:
         order.status = 'Cancelled'
         order.save()
+        messages.success(request, f"Order {order_id} has been cancelled.")
     return redirect('my_orders')
 
 def offer_zone(request):
