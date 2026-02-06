@@ -8,7 +8,7 @@ urlpatterns = [
     path('product/<int:id>/', views.product_detail, name='product_detail'),
     path('offer-zone/', views.offer_zone, name='offer_zone'),
     
-    # --- Authentication (Standardized Names) ---
+    # --- Authentication ---
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -17,6 +17,10 @@ urlpatterns = [
     path('cart/', views.view_cart, name='view_cart'),
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('remove-from-cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    
+    # Ye raha quantity update karne ka path
+    path('update-cart/<int:product_id>/<str:action>/', views.update_cart_quantity, name='update_cart_quantity'),
+    
     path('wishlist/', views.view_wishlist, name='view_wishlist'),
     path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='toggle_wishlist'),
     

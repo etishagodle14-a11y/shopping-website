@@ -18,15 +18,24 @@
                                     <img src="{{ item.product.image.url }}" class="img-fluid" style="max-height: 120px; object-fit: contain;">
                                     
                                     <div class="d-flex align-items-center justify-content-center mt-3">
-                                        <button class="btn btn-sm btn-light border rounded-circle" style="width: 28px; height: 28px; line-height: 1;">-</button>
-                                        <input type="text" class="form-control form-control-sm text-center mx-2" value="{{ item.quantity }}" style="width: 45px;" readonly>
-                                        <button class="btn btn-sm btn-light border rounded-circle" style="width: 28px; height: 28px; line-height: 1;">+</button>
+                                        <a href="{% url 'update_cart_quantity' item.product.id 'minus' %}" 
+                                           class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center" 
+                                           style="width: 28px; height: 28px; text-decoration: none; color: black;">-</a>
+                                        
+                                        <input type="text" class="form-control form-control-sm text-center mx-2" 
+                                               value="{{ item.quantity }}" 
+                                               style="width: 45px;" readonly>
+                                        
+                                        <a href="{% url 'update_cart_quantity' item.product.id 'plus' %}" 
+                                           class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center" 
+                                           style="width: 28px; height: 28px; text-decoration: none; color: black;">+</a>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-9">
                                     <h5 class="mb-1 fw-normal">{{ item.product.name }}</h5>
                                     <p class="text-muted small mb-2">Category: {{ item.product.category.name }}</p>
+                                    
                                     <div class="d-flex align-items-center mb-2">
                                         <span class="fs-4 fw-bold">₹{{ item.product.price }}</span>
                                         {% if item.product.old_price %}
@@ -36,7 +45,7 @@
                                     </div>
                                     
                                     <div class="mt-4">
-                                        <a href="#" class="text-dark text-decoration-none fw-bold me-4 save-later">SAVE FOR LATER</a>
+                                        <a href="{% url 'toggle_wishlist' item.product.id %}" class="text-dark text-decoration-none fw-bold me-4 save-later">SAVE FOR LATER</a>
                                         <a href="{% url 'remove_from_cart' item.id %}" class="text-dark text-decoration-none fw-bold me-4">REMOVE</a>
                                         <a href="{% url 'buy_now' item.product.id %}" class="btn btn-sm btn-primary fw-bold px-3" style="border-radius: 2px;">BUY THIS ONLY</a>
                                     </div>
@@ -91,26 +100,34 @@
                         <span>₹{{ grand_total }}</span>
                     </div>
                     
-                    <p class="text-success fw-bold small mb-0">You will save ₹0 on this order</p>
+                    <p class="text-success fw-bold small mb-0">Safe and Secure Payments.</p>
                 </div>
             </div>
             
             <div class="mt-3 text-muted d-flex align-items-start small px-2">
                 <i class="bi bi-shield-fill-check fs-4 me-2"></i>
-                <span style="line-height: 1.2; margin-top: 5px;">Safe and Secure Payments. Easy returns. 100% Authentic products.</span>
+                <span style="line-height: 1.2; margin-top: 5px;">Easy returns. 100% Authentic products.</span>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    body { background-color: #bfb7ebff; }
-    .item-row:hover { background-color: rgba(191, 183, 235, 0.2); }
-    .save-later:hover, .remove:hover { color: #60367cff !important; }
+    body { background-color: #f1f3f6; } 
+    .item-row:hover { background-color: #fafafa; }
+    .save-later:hover { color: #60367cff !important; }
     .sticky-bottom {
         position: sticky;
         bottom: 0;
         z-index: 1000;
+    }
+    /* Button styles to look like Flipkart */
+    .btn-light.border.rounded-circle {
+        background-color: #fff;
+        border: 1px solid #dbdbdb !important;
+    }
+    .btn-light.border.rounded-circle:hover {
+        background-color: #f8f8f8;
     }
 </style>
 {% endblock %}

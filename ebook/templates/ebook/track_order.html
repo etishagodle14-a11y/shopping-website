@@ -42,49 +42,70 @@
         font-size: 1.2rem;
     }
     
-    /* Active State (Brand Color) */
+    /* Active State (Theme Color) */
     .track-step.active .track-icon { 
-        background: #60367c; /* Aapka Theme Color */
+        background: #60367c; 
         box-shadow: 0 0 10px rgba(96, 54, 124, 0.4);
     }
     .track-step.active::before { background: #60367c; }
     .track-step.active .track-text { color: #60367c; font-weight: bold; }
 
+    /* Cancelled State Logic */
+    .track-step.cancelled .track-icon { 
+        background: #dc3545 !important; 
+    }
+    .track-step.cancelled .track-text { color: #dc3545 !important; }
+
     .track-text { color: #6c757d; transition: 0.3s ease; }
     body { background-color: #f1f3f6; }
+
+    /* Mobile specific adjustment */
+    @media (max-width: 576px) {
+        .track-text { font-size: 10px; }
+        .track-icon { width: 30px; height: 30px; line-height: 30px; font-size: 0.9rem; }
+        .track-step::before { top: 15px; }
+    }
 </style>
 
 <div class="container mt-5 mb-5">
     <div class="card shadow-sm border-0 rounded-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
             <h5 class="fw-bold mb-0">Track Order: <span class="text-primary">#{{ order.order_id }}</span></h5>
-            <span class="badge {% if order.status == 'Delivered' %}bg-success{% else %}bg-info{% endif %} px-3 py-2">
+            <span class="badge {% if order.status == 'Delivered' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-info{% endif %} px-3 py-2">
                 {{ order.status }}
             </span>
         </div>
+        
         <div class="card-body px-md-5">
-            <div class="track-container-main">
-                <div class="track-step active">
-                    <span class="track-icon"><i class="bi bi-cart-check"></i></span>
-                    <p class="track-text small mb-0">Order Placed</p>
-                    <small class="text-muted">{{ order.created_at|date:"d M" }}</small>
+            {% if order.status == 'Cancelled' %}
+                <div class="text-center py-4">
+                    <h4 class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-2"></i>This order has been cancelled.</h4>
+                    <p class="text-muted small">Refund will be processed as per policy (if applicable).</p>
                 </div>
+            {% else %}
+                <div class="track-container-main">
+                    <div class="track-step active">
+                        <span class="track-icon"><i class="bi bi-cart-check"></i></span>
+                        <p class="track-text small mb-0">Order Placed</p>
+                        <small class="text-muted">{{ order.created_at|date:"d M" }}</small>
+                    </div>
 
-                <div class="track-step {% if order.status != 'Pending' %}active{% endif %}">
-                    <span class="track-icon"><i class="bi bi-box-seam"></i></span>
-                    <p class="track-text small mb-0">Packed</p>
-                </div>
+                    <div class="track-step {% if order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Delivered' %}active{% endif %}">
+                        <span class="track-icon"><i class="bi bi-box-seam"></i></span>
+                        <p class="track-text small mb-0">Packed</p>
+                    </div>
 
-                <div class="track-step {% if order.status == 'Shipped' or order.status == 'Delivered' %}active{% endif %}">
-                    <span class="track-icon"><i class="bi bi-truck"></i></span>
-                    <p class="track-text small mb-0">Shipped</p>
-                </div>
+                    <div class="track-step {% if order.status == 'Shipped' or order.status == 'Delivered' %}active{% endif %}">
+                        <span class="track-icon"><i class="bi bi-truck"></i></span>
+                        <p class="track-text small mb-0">Shipped</p>
+                    </div>
 
-                <div class="track-step {% if order.status == 'Delivered' %}active{% endif %}">
-                    <span class="track-icon"><i class="bi bi-house-check"></i></span>
-                    <p class="track-text small mb-0">Delivered</p>
+                    <div class="track-step {% if order.status == 'Delivered' %}active{% endif %}">
+                        <span class="track-icon"><i class="bi bi-house-check"></i></span>
+                        <p class="track-text small mb-0">Delivered</p>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -106,7 +127,7 @@
                         </div>
                         <div>
                             <h6 class="fw-bold mb-1">E-Book/Product Package</h6>
-                            <p class="small text-muted mb-0">Quantity: 1 | Method: {{ order.payment_method }}</p>
+                            <p class="small text-muted mb-0">Order ID: {{ order.order_id }} | Method: {{ order.payment_method }}</p>
                         </div>
                     </div>
                 </div>

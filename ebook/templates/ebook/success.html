@@ -3,21 +3,21 @@
 {% block content %}
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 rounded-0 text-center p-4 p-md-5">
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-sm border-0 text-center p-4 p-md-5 success-card">
                 <div class="mb-4">
                     <i class="bi bi-check-circle-fill text-success animate-check" style="font-size: 5rem;"></i>
                 </div>
                 
                 <h2 class="fw-bold mb-3 text-dark">Order Placed Successfully!</h2>
-                <p class="text-muted">Thank you, <strong class="text-dark">{{ request.user.username }}</strong>. Your order has been received and is being processed.</p>
+                <p class="text-muted">Thank you, <strong class="text-dark">{{ request.user.username|title }}</strong>. Your order has been received and is being processed.</p>
                 
                 <hr class="my-4">
 
-                <div class="bg-light p-3 mb-4 rounded text-start">
+                <div class="bg-light p-3 mb-4 rounded text-start border">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small text-uppercase fw-bold">Order ID:</span>
-                        <span class="fw-bold text-primary">{{ id }}</span>
+                        <span class="fw-bold text-primary">#{{ id }}</span>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-2">
@@ -28,7 +28,7 @@
                             {% elif method == 'COD' %}
                                 <i class="bi bi-cash text-success"></i> Cash on Delivery
                             {% else %}
-                                {{ method|default:"Not Specified" }}
+                                {{ method }}
                             {% endif %}
                         </span>
                     </div>
@@ -45,56 +45,82 @@
                 </div>
 
                 {% if method == 'UPI' %}
-                    <div class="mb-4" style="background-color: #f8f9fa; padding: 20px; border: 2px dashed #28a745; border-radius: 10px; text-align: center;">
-                        <h4 style="color: #28a745; font-weight: bold;"><i class="bi bi-upc-scan me-2"></i>Pay via UPI</h4>
+                    <div class="mb-4 upi-payment-box">
+                        <h4 class="text-success fw-bold"><i class="bi bi-upc-scan me-2"></i>Pay via UPI</h4>
+                        <p class="small text-muted mb-3">Please pay **₹{{ amount }}** to confirm your order.</p>
                         
-                        <div class="my-3">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ amount }}&cu=INR" alt="UPI QR Code" class="img-fluid border p-2 bg-white shadow-sm">
+                        <div class="my-3 text-center">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ amount }}&cu=INR" 
+                                 alt="UPI QR Code" 
+                                 class="img-fluid border p-2 bg-white shadow-sm qr-img">
                         </div>
 
-                        <p class="mb-2">Scan QR or use UPI ID:</p>
-                        <div class="p-2 mb-3" style="background: #fff; border: 1px solid #ddd; display: inline-block; border-radius: 5px;">
-                            <h5 style="font-weight: bold; color: #333; margin-bottom: 0;">krishugodle@oksbi</h5>
+                        <div class="upi-id-wrapper mb-3">
+                            <span class="small d-block text-muted mb-1">UPI ID:</span>
+                            <div class="input-group input-group-sm mx-auto" style="max-width: 250px;">
+                                <input type="text" class="form-control text-center fw-bold" value="krishugodle@oksbi" id="upiId" readonly>
+                                <button class="btn btn-outline-success" type="button" onclick="copyUpi()">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2 mb-3">
-                            <a href="upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&tr={{ id }}&cu=INR" class="btn btn-success fw-bold py-3">
+                            <a href="upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&tr={{ id }}&am={{ amount }}&cu=INR" class="btn btn-success fw-bold py-3 shadow-sm rounded-pill">
                                 <i class="bi bi-phone me-2"></i> PAY NOW VIA APP
                             </a>
-                            <a href="https://wa.me/91XXXXXXXXXX?text=Hi, I have paid for Order ID #{{ id }}. Here is the screenshot." target="_blank" class="btn btn-outline-dark fw-bold">
-                                <i class="bi bi-whatsapp me-2"></i> SEND SCREENSHOT
+                            <a href="https://wa.me/910000000000?text=Hi, I have paid ₹{{ amount }} for Order ID #{{ id }}. Here is the screenshot." 
+                               target="_blank" class="btn btn-outline-dark fw-bold rounded-pill">
+                                <i class="bi bi-whatsapp me-2"></i> SEND PAYMENT SCREENSHOT
                             </a>
                         </div>
 
-                        <p class="small text-muted">Payment ke baad screenshot WhatsApp par zaroor bhejein.</p>
+                        <p class="x-small text-danger"><i class="bi bi-info-circle me-1"></i> Screenshot bhejne ke baad hi order process hoga.</p>
                     </div>
                 {% else %}
-                    <div class="alert alert-info border-0 rounded-0 mb-4">
-                        <i class="bi bi-info-circle me-2"></i> Aapka order <strong>Cash on Delivery (COD)</strong> ke liye confirm ho gaya hai.
+                    <div class="alert alert-info border-0 rounded-3 mb-4 text-start">
+                        <h6 class="fw-bold"><i class="bi bi-truck me-2"></i>Cash on Delivery</h6>
+                        <p class="small mb-0">Aapka order receive ho gaya hai. Delivery agent ko cash taiyar rakhein.</p>
                     </div>
                 {% endif %}
 
                 <div class="d-grid gap-2">
-                    <a href="{% url 'my_orders' %}" class="btn btn-lg rounded-0 fw-bold text-white" style="background-color: #60367cff;">
+                    <a href="{% url 'my_orders' %}" class="btn btn-lg rounded-pill fw-bold text-white shadow" style="background-color: #60367c;">
                         <i class="bi bi-bag-check me-2"></i> VIEW MY ORDERS
                     </a>
-                    <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-lg rounded-0 fw-bold">
-                        CONTINUE SHOPPING
+                    <a href="{% url 'product_list' %}" class="btn btn-link text-decoration-none text-muted">
+                        Continue Shopping
                     </a>
                 </div>
-                
-                <p class="mt-4 small text-muted">A confirmation email/message will be sent to you shortly.</p>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    body { background-color: #f1f3f6; }
+    body { background-color: #f8f9fa; }
     
+    .success-card {
+        border-top: 8px solid #60367c !important; 
+        border-radius: 20px !important;
+    }
+
+    .upi-payment-box {
+        background-color: #f0fff4; 
+        padding: 25px; 
+        border: 2px dashed #28a745; 
+        border-radius: 15px;
+    }
+
+    .qr-img {
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+    .qr-img:hover { transform: scale(1.05); }
+
     .animate-check {
         display: inline-block;
-        animation: scaleIn 0.5s ease-out;
+        animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     @keyframes scaleIn {
@@ -102,45 +128,26 @@
         100% { transform: scale(1); opacity: 1; }
     }
 
-    .card {
-        border-top: 5px solid #60367cff !important; 
-        border-radius: 15px !important;
-    }
+    .x-small { font-size: 11px; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
+    function copyUpi() {
+        var copyText = document.getElementById("upiId");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        alert("UPI ID Copied: " + copyText.value);
+    }
+
     window.onload = function() {
         confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 },
-            colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff']
+            colors: ['#60367c', '#28a745', '#ffc107', '#17a2b8']
         });
-
-        var duration = 3 * 1000;
-        var end = Date.now() + duration;
-
-        (function frame() {
-            confetti({
-                particleCount: 3,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 },
-                colors: ['#60367c', '#a25afd']
-            });
-            confetti({
-                particleCount: 3,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 },
-                colors: ['#f253a8ff', '#d868f1ff']
-            });
-
-            if (Date.now() < end) {
-                requestAnimationFrame(frame);
-            }
-        }());
     };
 </script>
 {% endblock %}

@@ -54,7 +54,7 @@ def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             messages.success(request, "Registration successful! Please Login.")
             return redirect('login')
     else:
@@ -72,7 +72,6 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'ebook/login.html', {'form': form})
 
-# UPDATED: Ab logout ke baad user Home Page (product_list) par jayega
 def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully.")
@@ -81,10 +80,8 @@ def logout_view(request):
 # ==========================================
 # 3. CART & WISHLIST
 # ==========================================
+@login_required
 def add_to_cart(request, product_id):
-    if not request.user.is_authenticated:
-        messages.info(request, "Please login first to add items to cart.")
-        return redirect('login')
     product = get_object_or_404(Product, id=product_id)
     cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
     if not created:
@@ -92,12 +89,40 @@ def add_to_cart(request, product_id):
         cart_item.save()
     return redirect('view_cart')
 
+@login_required
+def update_cart_quantity(request, product_id, action):
+    product = get_object_or_404(Product, id=product_id)
+    cart_item = get_object_or_404(CartItem, product=product, user=request.user)
+
+    if action == 'plus':
+        cart_item.quantity += 1
+        cart_item.save()
+    elif action == 'minus':
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+            messages.info(request, "Item removed from cart.")
+    
+    return redirect('view_cart')
+
 def view_cart(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    
     cart_items = CartItem.objects.filter(user=request.user)
     total = sum(item.total_price() for item in cart_items)
-    return render(request, 'ebook/cart.html', {'cart_items': cart_items, 'total': total, 'grand_total': total})
+    
+    delivery_charge = 0 if total > 500 or total == 0 else 40
+    grand_total = total + delivery_charge
+    
+    return render(request, 'ebook/cart.html', {
+        'cart_items': cart_items, 
+        'total': total, 
+        'delivery_charge': delivery_charge,
+        'grand_total': grand_total
+    })
 
 def remove_from_cart(request, item_id):
     get_object_or_404(CartItem, id=item_id, user=request.user).delete()
@@ -141,11 +166,14 @@ def checkout(request):
         if gift_card:
             discount = gift_card.amount
 
-    grand_total = max(0, total - discount)
+    delivery_charge = 0 if total > 500 else 40
+    grand_total = max(0, total + delivery_charge - discount)
+    
     return render(request, 'ebook/checkout.html', {
         'cart_items': cart_items, 
         'total': total,
         'discount': discount,
+        'delivery_charge': delivery_charge,
         'grand_total': grand_total,
     })
 
@@ -167,7 +195,8 @@ def place_order(request):
                 gift_card.used_by = request.user
                 gift_card.save()
 
-        final_amount = max(0, total_price - discount)
+        delivery_charge = 0 if total_price > 500 else 40
+        final_amount = max(0, total_price + delivery_charge - discount)
         order_id = f"ORD-{uuid.uuid4().hex[:8].upper()}"
         payment_mode = request.POST.get('payment_method', 'COD')
 
@@ -207,11 +236,16 @@ def track_order(request, order_id):
 
 @login_required
 def cancel_order(request, order_id):
+    """Order cancel karne ka merged aur optimized view"""
     order = get_object_or_404(Order, order_id=order_id, user=request.user)
+    
     if order.status not in ['Delivered', 'Cancelled']:
         order.status = 'Cancelled'
         order.save()
-        messages.success(request, f"Order {order_id} has been cancelled.")
+        messages.success(request, f"Order #{order_id} successfully cancel kar diya gaya hai.")
+    else:
+        messages.error(request, "Is order ko ab cancel nahi kiya ja sakta.")
+        
     return redirect('my_orders')
 
 def offer_zone(request):

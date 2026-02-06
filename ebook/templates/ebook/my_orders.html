@@ -57,15 +57,17 @@
                     
                     <div class="mt-3 mt-md-0 d-flex gap-2">
                         {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-0 px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#cancelModal{{ order.order_id }}">
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-0 px-3 fw-bold" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#cancelModal{{ order.id }}">
                                 CANCEL ORDER
                             </button>
 
-                            <div class="modal fade" id="cancelModal{{ order.order_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade" id="cancelModal{{ order.id }}" tabindex="-1" aria-labelledby="modalLabel{{ order.id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content rounded-0">
                                         <div class="modal-header border-0">
-                                            <h5 class="modal-title fw-bold">Cancel Order?</h5>
+                                            <h5 class="modal-title fw-bold" id="modalLabel{{ order.id }}">Cancel Order?</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body text-start">
