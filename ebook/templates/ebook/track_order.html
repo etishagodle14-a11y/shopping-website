@@ -2,9 +2,9 @@
 
 {% block content %}
 <style>
-    /* Horizontal Tracking Timeline */
+    /* Premium Tracking Timeline */
     .track-container-main {
-        padding: 40px 0;
+        padding: 50px 0;
         list-style: none;
         display: flex;
         justify-content: space-between;
@@ -14,120 +14,150 @@
         flex: 1;
         text-align: center;
         position: relative;
+        z-index: 2;
     }
+    /* Line connecting steps */
     .track-step::before {
         content: "";
         position: absolute;
-        top: 20px;
+        top: 25px;
         left: -50%;
         width: 100%;
-        height: 4px;
-        background: #ddd;
-        z-index: 1;
-        transition: 0.3s ease;
+        height: 6px;
+        background: #e9ecef;
+        z-index: -1;
+        transition: 0.4s ease;
     }
     .track-step:first-child::before { display: none; }
     
     .track-icon {
-        width: 40px;
-        height: 40px;
-        line-height: 40px;
+        width: 50px;
+        height: 50px;
+        line-height: 50px;
         border-radius: 50%;
-        background: #ddd;
-        color: white;
+        background: #e9ecef;
+        color: #adb5bd;
         display: inline-block;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 2;
-        font-size: 1.2rem;
+        margin-bottom: 12px;
+        font-size: 1.4rem;
+        transition: 0.4s;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     
     /* Active State (Theme Color) */
     .track-step.active .track-icon { 
-        background: #60367cff; 
-        box-shadow: 0 0 10px rgba(96, 54, 124, 0.4);
+        background: #60367c; 
+        color: #fff;
+        box-shadow: 0 0 15px rgba(96, 54, 124, 0.3);
     }
-    .track-step.active::before { background: #60367cff; }
-    .track-step.active .track-text { color: #60367cff; font-weight: bold; }
+    .track-step.active::before { background: #60367c; }
+    .track-step.active .track-text { color: #212529; font-weight: 800; }
 
-    /* Cancelled State Logic */
-    .track-step.cancelled .track-icon { 
-        background: #dc3545 !important; 
-    }
-    .track-step.cancelled .track-text { color: #dc3545 !important; }
+    /* Success State for Delivered */
+    .track-step.active.delivered-step .track-icon { background: #28a745; }
+    .track-step.active.delivered-step::before { background: #28a745; }
 
-    .track-text { color: #6c757d; transition: 0.3s ease; }
-    body { background-color: #f1f3f6; }
-
-    /* Mobile specific adjustment */
-    @media (max-width: 576px) {
-        .track-text { font-size: 10px; }
-        .track-icon { width: 30px; height: 30px; line-height: 30px; font-size: 0.9rem; }
-        .track-step::before { top: 15px; }
+    .track-text { color: #adb5bd; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    body { background-color: #f4f7f6; }
+    .card { border-radius: 12px; }
+    
+    @media (max-width: 768px) {
+        .track-container-main { padding: 30px 0; }
+        .track-text { font-size: 9px; letter-spacing: 0; }
+        .track-icon { width: 35px; height: 35px; line-height: 35px; font-size: 1rem; }
+        .track-step::before { top: 18px; height: 4px; }
     }
 </style>
 
 <div class="container mt-5 mb-5">
-    <div class="card shadow-sm border-0 rounded-0 mb-4">
-        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="fw-bold mb-0">Track Order: <span class="text-primary">#{{ order.order_id }}</span></h5>
-            <span class="badge {% if order.status == 'Delivered' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-info{% endif %} px-3 py-2">
-                {{ order.status }}
-            </span>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <span class="text-muted small text-uppercase fw-bold">Order Tracking</span>
+                <h4 class="fw-black mb-0">ID: #{{ order.order_id }}</h4>
+            </div>
+            <div class="text-md-end mt-2 mt-md-0">
+                <span class="badge {% if order.status == 'Delivered' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-warning text-dark{% endif %} rounded-pill px-4 py-2 fs-6">
+                    {{ order.status|upper }}
+                </span>
+            </div>
         </div>
         
         <div class="card-body px-md-5">
             {% if order.status == 'Cancelled' %}
-                <div class="text-center py-4">
-                    <h4 class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-2"></i>This order has been cancelled.</h4>
-                    <p class="text-muted small">Refund will be processed as per policy (if applicable).</p>
+                <div class="text-center py-5">
+                    <div class="mb-3"><i class="bi bi-x-octagon-fill text-danger display-1"></i></div>
+                    <h3 class="text-danger fw-bold">Order Cancelled</h3>
+                    <p class="text-muted">Aapka order cancel kar diya gaya hai. Agar koi payment hui thi, toh wo 5-7 days mein refund ho jayegi.</p>
                 </div>
             {% else %}
                 <div class="track-container-main">
                     <div class="track-step active">
-                        <span class="track-icon"><i class="bi bi-cart-check"></i></span>
-                        <p class="track-text small mb-0">Order Placed</p>
-                        <small class="text-muted">{{ order.created_at|date:"d M" }}</small>
+                        <span class="track-icon"><i class="bi bi-check-lg"></i></span>
+                        <p class="track-text">Placed</p>
+                        <small class="text-muted d-none d-md-block">{{ order.created_at|date:"d M" }}</small>
                     </div>
 
-                    <div class="track-step {% if order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Delivered' %}active{% endif %}">
+                    <div class="track-step {% if order.status != 'Pending' %}active{% endif %}">
                         <span class="track-icon"><i class="bi bi-box-seam"></i></span>
-                        <p class="track-text small mb-0">Packed</p>
+                        <p class="track-text">Packed</p>
                     </div>
 
                     <div class="track-step {% if order.status == 'Shipped' or order.status == 'Delivered' %}active{% endif %}">
                         <span class="track-icon"><i class="bi bi-truck"></i></span>
-                        <p class="track-text small mb-0">Shipped</p>
+                        <p class="track-text">Shipped</p>
                     </div>
 
-                    <div class="track-step {% if order.status == 'Delivered' %}active{% endif %}">
-                        <span class="track-icon"><i class="bi bi-house-check"></i></span>
-                        <p class="track-text small mb-0">Delivered</p>
+                    <div class="track-step {% if order.status == 'Delivered' %}active delivered-step{% endif %}">
+                        <span class="track-icon"><i class="bi bi-house-heart"></i></span>
+                        <p class="track-text">Delivered</p>
                     </div>
                 </div>
+
+                {% if order.status != 'Delivered' %}
+                <div class="alert alert-primary border-0 rounded-4 d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                    <div>
+                        <strong>Estimated Delivery:</strong> 2-3 Business Days mein aapka order pahunch jayega.
+                    </div>
+                </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-7">
-            <div class="card shadow-sm border-0 rounded-0 mb-4 h-100">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Delivery Address</h6>
-                    <h5 class="fw-bold mb-1">{{ request.user.username|title }}</h5>
-                    <p class="text-dark">
-                        {{ order.address|default:"Address not provided" }}<br>
-                        <strong>Phone:</strong> {{ order.phone|default:"N/A" }}
-                    </p>
-                    <hr>
-                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Order Items</h6>
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="p-3 bg-light border me-3">
-                            <i class="bi bi-journal-text fs-2" style="color: #60367cff;"></i>
+            <div class="card shadow-sm border-0 mb-4 h-100 p-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="p-2 bg-purple-light rounded-3 me-3">
+                            <i class="bi bi-geo-alt-fill text-purple"></i>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-1">E-Book/Product Package</h6>
-                            <p class="small text-muted mb-0">Order ID: {{ order.order_id }} | Method: {{ order.payment_method }}</p>
+                        <h6 class="fw-bold mb-0 text-uppercase tracking-wide text-muted small">Shipping Details</h6>
+                    </div>
+                    
+                    <h5 class="fw-bold mb-1">{{ request.user.get_full_name|default:request.user.username|title }}</h5>
+                    <p class="text-secondary mb-4">
+                        <i class="bi bi-house-door me-1"></i> {{ order.address|default:"No address provided" }}<br>
+                        <i class="bi bi-telephone me-1"></i> +91 {{ order.phone|default:"XXXXXXXXXX" }}
+                    </p>
+                    
+                    <hr class="opacity-10 mb-4">
+
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">Item Summary</h6>
+                    <div class="d-flex align-items-center p-3 bg-light rounded-3 border-start border-4 border-purple">
+                        <div class="me-3">
+                            <i class="bi bi-box-fill fs-2 text-purple"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-0">Order Package</h6>
+                            <p class="small text-muted mb-0">Payment: {{ order.payment_method }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold">₹{{ order.amount }}</span>
                         </div>
                     </div>
                 </div>
@@ -135,31 +165,33 @@
         </div>
 
         <div class="col-md-5">
-            <div class="card shadow-sm border-0 rounded-0 h-100">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold text-uppercase small text-muted mb-4">Payment Summary</h6>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal</span>
+            <div class="card shadow-sm border-0 h-100 p-3">
+                <div class="card-body">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-4">Price Details</h6>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-secondary">Item Total</span>
                         <span class="fw-bold">₹{{ order.amount }}</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping Fee</span>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-secondary">Delivery Charges</span>
                         <span class="text-success fw-bold">FREE</span>
                     </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="h5 fw-bold">Total Amount</span>
-                        <span class="h4 fw-bold text-primary">₹{{ order.amount }}</span>
+                    <div class="d-flex justify-content-between mb-4 pt-3 border-top">
+                        <span class="h5 fw-black">Total Paid</span>
+                        <span class="h4 fw-black text-purple">₹{{ order.amount }}</span>
                     </div>
                     
-                    <div class="alert {% if order.is_paid %}alert-success{% else %}alert-warning{% endif %} rounded-0 py-2">
-                        <i class="bi {% if order.is_paid %}bi-patch-check-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
-                        Payment Status: <strong>{% if order.is_paid %}Paid{% else %}Pending{% endif %}</strong>
+                    <div class="payment-status-badge d-flex align-items-center p-3 rounded-3 {% if order.is_paid %}bg-success-light text-success{% else %}bg-warning-light text-dark{% endif %}">
+                        <i class="bi {% if order.is_paid %}bi-shield-fill-check{% else %}bi-clock-history{% endif %} fs-4 me-3"></i>
+                        <div>
+                            <p class="small mb-0 fw-bold">Payment Status</p>
+                            <span class="fw-black">{% if order.is_paid %}CONFIRMED{% else %}PENDING VERIFICATION{% endif %}</span>
+                        </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'my_orders' %}" class="btn btn-outline-dark rounded-0">
-                            <i class="bi bi-arrow-left me-2"></i> Back to My Orders
+                    <div class="mt-4">
+                        <a href="{% url 'my_orders' %}" class="btn btn-dark w-100 py-2 rounded-pill fw-bold">
+                            <i class="bi bi-arrow-left me-2"></i> ALL ORDERS
                         </a>
                     </div>
                 </div>
@@ -167,4 +199,13 @@
         </div>
     </div>
 </div>
+
+<style>
+    .fw-black { font-weight: 900; }
+    .text-purple { color: #60367c !important; }
+    .bg-purple-light { background-color: #60367c15; }
+    .bg-success-light { background-color: #d4edda; }
+    .bg-warning-light { background-color: #fff3cd; }
+    .tracking-wide { letter-spacing: 1px; }
+</style>
 {% endblock %}

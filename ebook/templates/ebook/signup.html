@@ -4,66 +4,97 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow border-0 p-4" style="border-radius: 15px;">
-                <h3 class="text-center fw-bold mb-4" style="color: #60367cff;">Create Account</h3>
+            <div class="card shadow-lg border-0 p-4 p-md-5" style="border-radius: 20px;">
+                <div class="text-center mb-4">
+                    <div class="d-inline-block p-3 rounded-circle mb-2" style="background-color: #60367c11;">
+                        <i class="bi bi-person-plus-fill fs-2" style="color: #60367c;"></i>
+                    </div>
+                    <h3 class="fw-bold" style="color: #60367c;">Join Apna Mart</h3>
+                    <p class="text-muted small">Apna account banayein aur shopping shuru karein</p>
+                </div>
                 
-                <form method="POST">
+                <form method="POST" novalidate>
                     {% csrf_token %}
                     
                     {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label fw-bold" style="color: #555;">{{ field.label }}</label>
+                        <div class="mb-3 position-relative">
+                            <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">
+                                {{ field.label }}
+                            </label>
+                            
                             {{ field }}
                             
                             {% if field.help_text %}
-                                <small class="text-muted d-block" style="font-size: 0.8rem; line-height: 1.2;">
-                                    {{ field.help_text }}
-                                </small>
+                                <div class="form-text mt-1 text-muted" style="font-size: 0.75rem;">
+                                    {{ field.help_text|safe }}
+                                </div>
                             {% endif %}
 
                             {% for error in field.errors %}
-                                <div class="text-danger small">{{ error }}</div>
+                                <div class="text-danger fw-bold mt-1" style="font-size: 0.75rem;">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error }}
+                                </div>
                             {% endfor %}
                         </div>
                     {% endfor %}
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn text-white fw-bold" style="background-color: #60367cff; padding: 10px;">
-                            SIGN UP
+                        <button type="submit" class="btn text-white fw-bold py-2 shadow-sm signup-btn">
+                            CREATE ACCOUNT
                         </button>
                     </div>
                 </form>
 
-                <p class="text-center mt-3 small">
-                    Already have an account? <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: #60367cff;">Login here</a>
-                </p>
+                <div class="text-center mt-4">
+                    <span class="text-muted small">Pehle se account hai?</span>
+                    <a href="{% url 'login' %}" class="text-decoration-none fw-bold ms-1" style="color: #60367c;">Login Karein</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Django form fields ko Bootstrap jaisa dikhane ke liye custom CSS */
-    input { 
+    body { background-color: #f8f9fa; }
+
+    /* Customizing Django-generated inputs */
+    input[type="text"], input[type="password"], input[type="email"], select, textarea { 
         width: 100%; 
-        padding: 10px; 
-        border: 1px solid #ddd; 
-        border-radius: 5px; 
-        margin-bottom: 5px;
-        outline: none;
+        padding: 12px 15px; 
+        border: 2px solid #eee; 
+        border-radius: 10px; 
+        transition: all 0.3s ease;
+        background-color: #fdfdfd;
+        font-size: 0.95rem;
     }
     
     input:focus {
-        border-color: #60367cff;
-        box-shadow: 0 0 5px rgba(96, 54, 124, 0.2);
+        border-color: #60367c88 !important;
+        background-color: #fff;
+        box-shadow: 0 0 0 0.25rem rgba(96, 54, 124, 0.1) !important;
+        outline: none;
     }
 
-    /* Help text ke list bullets hatane ke liye (Django default) */
-    ul.helptext {
-        list-style-type: none;
+    .signup-btn {
+        background: linear-gradient(45deg, #60367c, #8e44ad);
+        border: none;
+        border-radius: 10px;
+        transition: 0.3s;
+    }
+
+    .signup-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(96, 54, 124, 0.3);
+        opacity: 0.9;
+    }
+
+    .tracking-wider { letter-spacing: 0.8px; }
+
+    /* Django default helptext list styling */
+    .form-text ul {
+        list-style: none;
         padding-left: 0;
-        font-size: 0.8rem;
-        color: #6c757d;
+        margin-bottom: 0;
     }
 </style>
 {% endblock %}

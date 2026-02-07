@@ -11,125 +11,108 @@
 
     {% if orders %}
         {% for order in orders %}
-        <div class="card mb-4 shadow-sm border-0 rounded-0 order-card">
-            <div class="card-header bg-white border-bottom py-3 px-4">
-                <div class="row text-center text-md-start g-3">
+        <div class="card mb-4 shadow-sm border-0 rounded-1 order-card overflow-hidden">
+            <div class="card-header bg-light border-bottom py-3 px-4">
+                <div class="row align-items-center g-3">
                     <div class="col-6 col-md-3">
-                        <p class="text-muted small text-uppercase mb-1">Order Placed</p>
-                        <span class="fw-bold text-dark">{{ order.created_at|date:"d M, Y" }}</span>
+                        <p class="text-muted extra-small text-uppercase mb-0">Order Placed</p>
+                        <span class="fw-bold text-dark small">{{ order.created_at|date:"d M, Y" }}</span>
                     </div>
                     <div class="col-6 col-md-2">
-                        <p class="text-muted small text-uppercase mb-1">Total</p>
-                        <span class="fw-bold text-dark">₹{{ order.amount }}</span>
+                        <p class="text-muted extra-small text-uppercase mb-0">Total Amount</p>
+                        <span class="fw-bold text-dark small">₹{{ order.amount }}</span>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <p class="text-muted small text-uppercase mb-1">Ship To</p>
-                        <span class="fw-bold text-primary">{{ request.user.username|title }}</span>
+                    <div class="col-6 col-md-3 d-none d-md-block">
+                        <p class="text-muted extra-small text-uppercase mb-0">Order ID</p>
+                        <span class="text-dark small">#{{ order.order_id }}</span>
                     </div>
-                    <div class="col-6 col-md-4 text-md-end">
-                        <p class="text-muted small text-uppercase mb-1">Order ID #{{ order.order_id }}</p>
-                        <a href="{% url 'track_order' order.order_id %}" class="text-decoration-none fw-bold" style="color: #60367c;">View Order Details</a>
+                    <div class="col-6 col-md-4 text-end">
+                        <a href="#" class="btn btn-sm btn-link text-decoration-none fw-bold p-0 me-3" style="color: #60367c; font-size: 13px;">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Invoice
+                        </a>
+                        <a href="{% url 'track_order' order.order_id %}" class="btn btn-sm btn-outline-secondary px-3" style="font-size: 12px;">DETAILS</a>
                     </div>
                 </div>
             </div>
 
             <div class="card-body p-4">
-                <div class="d-flex flex-column flex-md-row align-items-center">
-                    <div class="flex-shrink-0 mb-3 mb-md-0">
-                        <i class="bi bi-box-seam text-primary" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-md-4 text-center text-md-start">
-                        <h6 class="mb-1 fw-bold">Status: 
-                            <span class="badge rounded-pill 
-                                {% if order.status == 'Delivered' %}bg-success
-                                {% elif order.status == 'Pending' %}bg-warning text-dark
-                                {% elif order.status == 'Cancelled' %}bg-danger
-                                {% else %}bg-info text-white{% endif %}">
+                <div class="row align-items-start">
+                    <div class="col-md-7 border-end">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge {% if order.status == 'Delivered' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-info{% endif %} me-2">
                                 {{ order.status|default:"Processing" }}
                             </span>
-                        </h6>
-                        <p class="mb-0 text-muted small">
-                            <strong>Payment:</strong> {{ order.payment_method }} 
-                            <span class="mx-2">|</span>
-                            <strong>Status:</strong> {% if order.is_paid %}<span class="text-success">Paid</span>{% else %}<span class="text-danger">Not Paid</span>{% endif %}
-                        </p>
+                            <small class="text-muted fw-bold">Expected delivery by 14 Feb, 2026</small>
+                        </div>
+                        
+                        <div class="d-flex gap-3 mt-3 overflow-auto pb-2">
+                            <div class="item-thumb border rounded p-1">
+                                <i class="bi bi-box-seam fs-2 text-muted px-2"></i>
+                            </div>
+                            <div class="item-info">
+                                <p class="mb-0 fw-bold small text-truncate" style="max-width: 250px;">Package contains {{ order.items.count|default:"1" }} items</p>
+                                <small class="text-muted">Payment: {{ order.payment_method }} | {% if order.is_paid %}<span class="text-success fw-bold">Paid</span>{% else %}<span class="text-danger">Pending</span>{% endif %}</small>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="mt-3 mt-md-0 d-flex gap-2">
-                        {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
-                            <button type="button" class="btn btn-outline-danger btn-sm rounded-0 px-3 fw-bold" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#cancelModal{{ order.id }}">
-                                CANCEL ORDER
+                    <div class="col-md-5 ps-md-4 mt-3 mt-md-0">
+                        <h6 class="small fw-bold text-uppercase text-muted mb-3">Manage Order</h6>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'track_order' order.order_id %}" class="btn btn-warning btn-sm fw-bold py-2 shadow-sm">
+                                <i class="bi bi-geo-alt-fill me-1"></i> TRACK SHIPMENT
+                            </a>
+                            
+                            {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+                            <button type="button" class="btn btn-white border btn-sm py-2 fw-bold text-danger" 
+                                    data-bs-toggle="modal" data-bs-target="#cancelModal{{ order.id }}">
+                                <i class="bi bi-x-circle me-1"></i> CANCEL ORDER
                             </button>
+                            {% else %}
+                            <a href="/" class="btn btn-white border btn-sm py-2 fw-bold">REORDER ITEMS</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                            <div class="modal fade" id="cancelModal{{ order.id }}" tabindex="-1" aria-labelledby="modalLabel{{ order.id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content rounded-0">
-                                        <div class="modal-header border-0">
-                                            <h5 class="modal-title fw-bold" id="modalLabel{{ order.id }}">Cancel Order?</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-start">
-                                            Kya aap waqai Order <strong>#{{ order.order_id }}</strong> ko cancel karna chahte hain? Yeh action wapas nahi liya ja sakta.
-                                        </div>
-                                        <div class="modal-footer border-0">
-                                            <button type="button" class="btn btn-secondary rounded-0" data-bs-dismiss="modal">No, Keep it</button>
-                                            <a href="{% url 'cancel_order' order.order_id %}" class="btn btn-danger rounded-0 px-4">Yes, Cancel Order</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        <a href="{% url 'track_order' order.order_id %}" class="btn btn-dark btn-sm rounded-0 px-4 fw-bold shadow-sm">
-                            TRACK ORDER
-                        </a>
+        <div class="modal fade" id="cancelModal{{ order.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 bg-light">
+                        <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Cancellation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-4">
+                        Aap Order <strong>#{{ order.order_id }}</strong> ko cancel kar rahe hain. Kya aap sure hain?
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">BACK</button>
+                        <a href="{% url 'cancel_order' order.order_id %}" class="btn btn-danger px-4 fw-bold">YES, CANCEL</a>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     {% else %}
-        <div class="text-center py-5 bg-white shadow-sm border">
-            <i class="bi bi-bag-x text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
-            <h4 class="mt-3 fw-bold">Aapne abhi tak koi order nahi kiya hai.</h4>
-            <p class="text-muted">Hamare naye collections check karein!</p>
-            <a href="{% url 'product_list' %}" class="btn text-white px-5 py-2 mt-2 rounded-0 shadow" style="background-color: #60367cff;">SHOP NOW</a>
+        <div class="text-center py-5 bg-white shadow-sm border rounded">
+            <div class="mb-4">
+                <img src="https://img.icons8.com/clouds/200/000000/box.png" width="150" class="opacity-75">
+            </div>
+            <h4 class="fw-bold">Koi Order nahi mila!</h4>
+            <p class="text-muted">Lagta hai aapne abhi tak hamari shop explore nahi ki hai.</p>
+            <a href="/" class="btn text-white px-5 py-2 mt-2 rounded-1 fw-bold" style="background-color: #fb641b;">START SHOPPING</a>
         </div>
     {% endif %}
 </div>
 
 <style>
-    body { background-color: #f8f9fa; }
-    
-    .order-card {
-        transition: all 0.3s ease;
-        border-top: 3px solid #60367cff !important;
-    }
-
-    .order-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-    }
-
-    .badge {
-        font-weight: 500;
-        padding: 0.5em 1em;
-    }
-
-    .btn-dark {
-        background-color: #212529;
-        border: none;
-    }
-
-    .btn-dark:hover {
-        background-color: #60367cff;
-    }
-
-    .btn-outline-danger:hover {
-        background-color: #b60f20ff;
-        color: white;
-    }
+    .extra-small { font-size: 11px; letter-spacing: 0.5px; }
+    .order-card { transition: 0.3s; border-left: 4px solid #60367cff !important; border-top: none !important; }
+    .order-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.1) !important; }
+    .btn-warning { background-color: #ff9f00; border: none; color: #fff; }
+    .btn-warning:hover { background-color: #f39700; color: #fff; }
+    .item-thumb { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; }
 </style>
 {% endblock %}

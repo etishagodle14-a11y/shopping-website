@@ -1,22 +1,12 @@
-import uuid
-import json
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Product, Category, CartItem, Order, Wishlist, GiftCard, Slider 
-from django.db.models import Q 
-from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction # Taaki order aur items ek saath save hon
+from .models import Product, Category, CartItem, Order, OrderItem, Wishlist, GiftCard, Slider 
 
-# ==========================================
-# 1. PRODUCT & SHOP VIEWS
-# ==========================================
+# --- PRODUCT & SHOP (Optimized) ---
 def product_list(request):
     query = request.GET.get('q', '').strip()
     category_name = request.GET.get('category')
+    
+    # Prefetching taaki database par load kam pade
     categories = Category.objects.all()
     sliders = Slider.objects.all() 
     
@@ -24,7 +14,7 @@ def product_list(request):
     if request.user.is_authenticated:
         wishlist_ids = Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True)
     
-    products = Product.objects.filter(available=True)
+    products = Product.objects.filter(available=True).select_related('category')
 
     if query:
         products = products.filter(
@@ -44,221 +34,66 @@ def product_list(request):
         'query': query
     })
 
-def all_products(request):
-    products = Product.objects.filter(available=True).order_by('-id')
-    return render(request, 'ebook/all_products.html', {'products': products})
-
-def product_detail(request, id):
-    product = get_object_or_404(Product, id=id)
-    return render(request, 'ebook/details.html', {'product': product})
-
-def offer_zone(request):
-    products = Product.objects.filter(available=True).order_by('-id')[:12]
-    return render(request, 'ebook/offer_zone.html', {'products': products})
-
-# ==========================================
-# 2. AUTHENTICATION VIEWS
-# ==========================================
-def signup_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Registration successful! Please Login.")
-            return redirect('login')
-    else:
-        form = UserCreationForm()
-    return render(request, 'ebook/signup.html', {'form': form})
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect(request.GET.get('next', 'product_list'))
-    else:
-        form = AuthenticationForm()
-    return render(request, 'ebook/login.html', {'form': form})
-
-def logout_view(request):
-    logout(request)
-    messages.success(request, "Logged out successfully.")
-    return redirect('product_list') 
-
-# ==========================================
-# 3. CART & WISHLIST
-# ==========================================
-@login_required
-def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    cart_item, created = CartItem.objects.get_or_create(product=product, user=request.user)
-    if not created:
-        cart_item.quantity += 1
-        cart_item.save()
-    messages.success(request, "Product added to cart!")
-    return redirect('view_cart')
-
-@login_required
-def buy_now(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    CartItem.objects.get_or_create(product=product, user=request.user)
-    return redirect('checkout')
-
-@csrf_exempt
-@login_required
-def update_item(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            productId = data['productId']
-            action = data['action']
-            product = Product.objects.get(id=productId)
-            cart_item, created = CartItem.objects.get_or_create(user=request.user, product=product)
-            if action == 'add':
-                cart_item.quantity += 1
-            elif action == 'remove':
-                cart_item.quantity -= 1
-            cart_item.save()
-            if cart_item.quantity <= 0:
-                cart_item.delete()
-                return JsonResponse({'status': 'deleted'}, safe=False)
-            return JsonResponse({'status': 'updated', 'qty': cart_item.quantity}, safe=False)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@login_required
-def view_cart(request):
-    cart_items = CartItem.objects.filter(user=request.user)
-    total = sum(item.total_price() for item in cart_items)
-    delivery_charge = 0 if total > 500 or total == 0 else 40
-    grand_total = total + delivery_charge
-    return render(request, 'ebook/cart.html', {
-        'cart_items': cart_items, 
-        'total': total, 
-        'delivery_charge': delivery_charge,
-        'grand_total': grand_total
-    })
-
-def remove_from_cart(request, item_id):
-    get_object_or_404(CartItem, id=item_id, user=request.user).delete()
-    return redirect('view_cart')
-
-@login_required
-def toggle_wishlist(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
-    if not created:
-        wishlist_item.delete()
-    return redirect(request.META.get('HTTP_REFERER', 'product_list'))
-
-@login_required
-def view_wishlist(request):
-    wishlist_items = Wishlist.objects.filter(user=request.user)
-    return render(request, 'ebook/wishlist.html', {'wishlist_items': wishlist_items})
-
-# ==========================================
-# 4. CHECKOUT & ORDERS
-# ==========================================
-@login_required
-def checkout(request):
-    cart_items = CartItem.objects.filter(user=request.user)
-    if not cart_items:
-        messages.warning(request, "Aapka cart khali hai!")
-        return redirect('product_list')
-    
-    total = sum(item.total_price() for item in cart_items)
-    discount = 0
-    gift_card_id = request.session.get('gift_card_id')
-    if gift_card_id:
-        gift_card = GiftCard.objects.filter(id=gift_card_id, is_active=True).first()
-        if gift_card:
-            discount = gift_card.amount
-
-    delivery_charge = 0 if total > 500 else 40
-    grand_total = max(0, total + delivery_charge - discount)
-    
-    return render(request, 'ebook/checkout.html', {
-        'cart_items': cart_items, 
-        'total': total,
-        'discount': discount,
-        'delivery_charge': delivery_charge,
-        'grand_total': grand_total,
-    })
-
+# --- UPDATED PLACE ORDER (With Item Storage) ---
 @login_required
 def place_order(request):
     if request.method == "POST":
         cart_items = CartItem.objects.filter(user=request.user)
-        if not cart_items: return redirect('product_list')
+        if not cart_items:
+            messages.error(request, "Your cart is empty!")
+            return redirect('product_list')
 
-        total_price = sum(item.total_price() for item in cart_items)
-        discount = 0
-        gift_card_id = request.session.get('gift_card_id')
-        if gift_card_id:
-            gift_card = GiftCard.objects.filter(id=gift_card_id, is_active=True).first()
-            if gift_card:
-                discount = gift_card.amount
-                gift_card.is_active = False
-                gift_card.used_by = request.user
-                gift_card.save()
+        # Use transaction.atomic taaki agar ek bhi step fail ho, toh poora data roll-back ho jaye
+        with transaction.atomic():
+            total_price = sum(item.total_price() for item in cart_items)
+            discount = 0
+            
+            # Gift Card Logic
+            gift_card_id = request.session.get('gift_card_id')
+            if gift_card_id:
+                gift_card = GiftCard.objects.select_for_update().filter(id=gift_card_id, is_active=True).first()
+                if gift_card:
+                    discount = gift_card.amount
+                    gift_card.is_active = False
+                    gift_card.used_by = request.user
+                    gift_card.save()
 
-        delivery_charge = 0 if total_price > 500 else 40
-        final_amount = max(0, total_price + delivery_charge - discount)
-        order_id = f"ORD{uuid.uuid4().hex[:8].upper()}"
-        payment_mode = request.POST.get('payment_method', 'COD')
+            delivery_charge = 0 if total_price > 500 else 40
+            final_amount = max(0, total_price + delivery_charge - discount)
+            order_id = f"ORD{uuid.uuid4().hex[:8].upper()}"
+            
+            # 1. Create Main Order
+            order = Order.objects.create(
+                user=request.user, 
+                order_id=order_id, 
+                amount=final_amount, 
+                payment_method=request.POST.get('payment_method', 'COD'),
+                full_name=request.POST.get('full_name'),
+                phone=request.POST.get('phone'),
+                address=f"{request.POST.get('address')}, {request.POST.get('city')} - {request.POST.get('pincode')}"
+            )
 
-        Order.objects.create(
-            user=request.user, 
-            order_id=order_id, 
-            amount=final_amount, 
-            payment_method=payment_mode,
-            full_name=request.POST.get('full_name'),
-            phone=request.POST.get('phone'),
-            address=f"{request.POST.get('address')}, {request.POST.get('city')} - {request.POST.get('pincode')}"
-        )
+            # 2. Save Order Items (PEHLE YEH MISSING THA)
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    price=item.product.price, # Purchase time ka price lock kar rahe hain
+                    quantity=item.quantity
+                )
+                # Stock update karna mat bhulna!
+                item.product.stock -= item.quantity
+                item.product.save()
+
+            # 3. Clear Cart & Session
+            cart_items.delete()
+            if 'gift_card_id' in request.session: 
+                del request.session['gift_card_id']
         
-        cart_items.delete()
-        if 'gift_card_id' in request.session: del request.session['gift_card_id']
+        return render(request, 'ebook/success.html', {
+            'id': order_id, 
+            'amount': final_amount, 
+            'method': order.payment_method
+        })
         
-        return render(request, 'ebook/success.html', {'id': order_id, 'amount': final_amount, 'method': payment_mode})
     return redirect('checkout')
-
-@login_required
-def my_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-id') 
-    return render(request, 'ebook/my_orders.html', {'orders': orders})
-
-@login_required
-def track_order(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, user=request.user)
-    return render(request, 'ebook/track_order.html', {'order': order})
-
-@login_required
-def cancel_order(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, user=request.user)
-    if order.status == 'Pending':
-        order.status = 'Cancelled'
-        order.save()
-        messages.success(request, f"Order {order_id} cancelled.")
-    else:
-        messages.error(request, "Cannot cancel this order.")
-    return redirect('my_orders')
-
-# ==========================================
-# 5. GIFT CARDS
-# ==========================================
-def apply_gift_card(request):
-    if request.method == "POST":
-        code = request.POST.get('code')
-        gift_card = GiftCard.objects.filter(code=code, is_active=True).first()
-        if gift_card:
-            request.session['gift_card_id'] = gift_card.id
-            messages.success(request, f"Gift Card Applied! ₹{gift_card.amount} discount.")
-        else:
-            messages.error(request, "Invalid or Expired Gift Card.")
-    return redirect('checkout')
-
-def gift_card_list(request):
-    return render(request, 'ebook/gift_cards.html')

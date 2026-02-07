@@ -3,54 +3,87 @@
 {% block content %}
 <div class="container my-5">
     <div class="text-center mb-5">
-        <h2 class="fw-bold"><i class="bi bi-gift text-warning"></i> Apna Mart Gift Cards</h2>
-        <p class="text-muted">Apne doston aur pariwar ko khushiyan gift karein!</p>
+        <h2 class="fw-bold" style="color: #60367c;">
+            <i class="bi bi-gift-fill text-warning me-2"></i>Apna Mart Gift Cards
+        </h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">
+            Perfect gift dhundna mushkil hai? Unhe khud chunne ka mauka dein! Apna Mart Gift Card se khushiyan share karein.
+        </p>
     </div>
 
     <div class="row g-4">
         {% for card in gift_cards %}
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden" style="border-radius: 15px; background: linear-gradient(135deg, #60367c 0%, #8e44ad 100%);">
-                <div class="position-absolute" style="width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; top: -50px; right: -50px;"></div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow position-relative overflow-hidden gift-card-main">
                 
-                <div class="card-body text-white p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <i class="bi bi-qr-code-scan fs-1"></i>
-                        <h4 class="fw-bold mb-0">₹{{ card.amount }}</h4>
+                <div class="deco-circle circle-1"></div>
+                <div class="deco-circle circle-2"></div>
+                
+                <div class="card-body text-white p-4 position-relative" style="z-index: 2;">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <img src="https://img.icons8.com/light/50/ffffff/contactless-payment.png" width="40" class="mb-2 opacity-75">
+                            <h5 class="fw-bold mb-0">E-Gift Card</h5>
+                        </div>
+                        <h3 class="fw-bold">₹{{ card.amount }}</h3>
                     </div>
                     
-                    <h5 class="card-title mb-1">E-Gift Card</h5>
-                    <p class="small opacity-75">Code: {{ card.code }}</p> 
+                    <div class="mt-5 pt-3">
+                        <p class="mb-1 small opacity-75 text-uppercase tracking-wider">Gift Code</p>
+                        <h5 class="fw-mono letter-spacing-2">XXXX - XXXX - {{ card.code|slice:"-4:" }}</h5>
+                    </div>
                     
                     <div class="mt-4">
-                        <a href="{% url 'buy_now' product_id=0 %}" class="btn btn-warning w-100 fw-bold shadow-sm">
-                            Buy Now
+                        <a href="{% url 'buy_now' card.id %}" class="btn btn-light w-100 fw-bold py-2 shadow-sm border-0" style="color: #60367c;">
+                            BUY NOW
                         </a>
                     </div>
                 </div>
                 
-                <div class="card-footer bg-white border-0 py-3">
-                    <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Valid for 1 year from date of purchase.</small>
+                <div class="card-footer bg-white border-0 py-3 text-center">
+                    <span class="text-muted" style="font-size: 12px;">
+                        <i class="bi bi-shield-check me-1"></i> 100% Secure & Instant Delivery
+                    </span>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
-            <i class="bi bi-emoji-frown fs-1 text-muted"></i>
-            <p class="mt-3 text-muted fs-5">Filhal koi Gift Card available nahi hai. Jaldi hi wapas aayein!</p>
+            <div class="bg-light d-inline-block p-4 rounded-circle mb-3">
+                <i class="bi bi-gift fs-1 text-muted"></i>
+            </div>
+            <p class="text-muted fs-5">Abhi koi Gift Cards active nahi hain. Kal check karein!</p>
         </div>
         {% endfor %}
     </div>
 </div>
 
 <style>
-    /* Hover Animation */
-    .card { 
-        transition: transform 0.3s ease, box-shadow 0.3s ease; 
+    .gift-card-main {
+        border-radius: 20px;
+        background: linear-gradient(135deg, #60367c 0%, #a25bc4 100%);
+        min-height: 220px;
     }
-    .card:hover { 
-        transform: translateY(-10px); 
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+    
+    .deco-circle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
     }
+    
+    .circle-1 { width: 150px; height: 150px; top: -50px; right: -50px; }
+    .circle-2 { width: 100px; height: 100px; bottom: -20px; left: -30px; }
+
+    .gift-card-main:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(96, 54, 124, 0.3) !important;
+    }
+
+    .fw-mono { font-family: 'Courier New', Courier, monospace; }
+    .letter-spacing-2 { letter-spacing: 2px; }
+    .tracking-wider { letter-spacing: 1px; }
+    
+    /* Animation */
+    .gift-card-main { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 </style>
 {% endblock %}

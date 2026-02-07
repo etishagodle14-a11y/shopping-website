@@ -1,21 +1,41 @@
 {% extends 'ebook/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h4 class="fw-bold mb-4">All Products</h4>
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold m-0">All Products</h4>
+        <small class="text-muted">{{ products.count }} Items found</small>
+    </div>
+
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
         {% for product in products %}
         <div class="col">
-            <div class="card h-100 border-0 shadow-sm">
-                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
-                    <div style="height: 180px; display: flex; align-items: center; justify-content: center; background: #fff;">
+            <div class="card h-100 border-0 shadow-sm position-relative product-card-hover">
+                
+                <a href="{% url 'toggle_wishlist' product.id %}" class="position-absolute top-0 end-0 m-2 text-decoration-none" style="z-index: 5;">
+                    <i class="bi bi-heart-fill {% if product.id in wishlist_ids %}text-danger{% else %}text-muted{% endif %}" style="font-size: 1rem; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));"></i>
+                </a>
+
+                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark d-block h-100">
+                    <div style="height: 180px; display: flex; align-items: center; justify-content: center; background: #fff; padding: 10px;">
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                            <img src="{{ product.image.url }}" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/200" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         {% endif %}
                     </div>
-                    <div class="card-body text-center p-2">
-                        <div class="fw-bold small text-truncate">{{ product.name }}</div>
-                        <div class="text-success">₹{{ product.price }}</div>
+                    
+                    <div class="card-body p-2 border-top">
+                        <div class="product-name-style mb-1">
+                            {{ product.name }}
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-dark fw-bold">₹{{ product.price }}</span>
+                            {% if product.old_price %}
+                            <small class="text-muted text-decoration-line-through" style="font-size: 11px;">₹{{ product.old_price }}</small>
+                            {% endif %}
+                        </div>
                     </div>
                 </a>
             </div>
@@ -23,4 +43,37 @@
         {% endfor %}
     </div>
 </div>
+
+<style>
+    /* कंसिस्टेंट डिज़ाइन के लिए ज़रूरी CSS */
+    .product-name-style {
+        font-size: 13px;
+        font-weight: 500;
+        color: #212121;
+        line-height: 1.4;
+        height: 38px; /* Fixed height for 2 lines */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .product-card-hover {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .product-card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    @media (max-width: 768px) {
+        .product-name-style {
+            font-size: 12px;
+            height: 34px;
+        }
+    }
+</style>
 {% endblock %}

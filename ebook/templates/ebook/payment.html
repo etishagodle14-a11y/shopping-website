@@ -1,25 +1,90 @@
-<div class="container text-center">
-    <h2>Complete Your Purchase</h2>
-    <p>Amount to pay: ₹50,000</p>
-    
-    <button id="pay-btn" class="btn btn-success btn-lg">Pay with Razorpay</button>
+{% extends 'ebook/base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header text-white p-4 text-center" style="background-color: #60367c;">
+                    <i class="bi bi-shield-lock-fill fs-1"></i>
+                    <h3 class="fw-bold mt-2">Secure Checkout</h3>
+                    <p class="mb-0 opacity-75 small">Order ID: #{{ order_id }}</p>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h6 class="text-muted text-uppercase small tracking-wider">Amount to Pay</h6>
+                        <h1 class="fw-black display-5" style="color: #212529;">₹{{ amount_display }}</h1>
+                    </div>
+
+                    <div class="bg-light rounded-3 p-3 mb-4 border-dashed">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Item Total</span>
+                            <span class="fw-bold">₹{{ amount_display }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-success">
+                            <span class="small">Delivery Charges</span>
+                            <span class="small fw-bold">FREE</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button id="pay-btn" class="btn btn-lg text-white fw-bold py-3 rounded-pill shadow-sm" 
+                                style="background: linear-gradient(90deg, #60367c 0%, #8e44ad 100%); border: none;">
+                            PROCEED TO PAY ₹{{ amount_display }}
+                        </button>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <p class="extra-small text-muted mb-3">Guaranteed Safe & Secure Checkout</p>
+                        <div class="d-flex justify-content-center gap-3 opacity-50">
+                            <img src="https://img.icons8.com/color/48/000000/visa.png" width="35">
+                            <img src="https://img.icons8.com/color/48/000000/mastercard.png" width="35">
+                            <img src="https://img.icons8.com/color/48/000000/upi.png" width="35">
+                            <img src="https://img.icons8.com/color/48/000000/rupay.png" width="35">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="/" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left me-1"></i> Cancel & Return to Shop</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .fw-black { font-weight: 900; }
+    .extra-small { font-size: 11px; }
+    .border-dashed { border: 1.5px dashed #dee2e6; }
+    .tracking-wider { letter-spacing: 1.5px; }
+    
+    /* Animation for Pay Button */
+    #pay-btn { transition: transform 0.2s; }
+    #pay-btn:active { transform: scale(0.98); }
+</style>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     var options = {
         "key": "{{ razorpay_key }}", 
-        "amount": "{{ amount }}", 
+        "amount": "{{ amount }}", // Amount in Paisa (e.g., 5000000 for ₹50,000)
         "currency": "INR",
-        "name": "Mobile Store",
-        "description": "Buying New Mobile",
+        "name": "Apna Mart",
+        "description": "Secure Payment for Order #{{ order_id }}",
+        "image": "https://img.icons8.com/clouds/100/000000/shopping-bag.png", // Aap apna logo yahan daal sakte hain
         "order_id": "{{ order_id }}", 
         "handler": function (response){
-            alert("Payment Successful! ID: " + response.razorpay_payment_id);
-            // Payment success hone ke baad user ko success page par bhej dein
-            window.location.href = "/payment-success/";
+            // Success hone par CSRF token ke sath verify karna best practice hai
+            window.location.href = "/payment-success/?payment_id=" + response.razorpay_payment_id + "&order_id=" + response.razorpay_order_id;
         },
-        "theme": { "color": "#60367cff" }
+        "prefill": {
+            "name": "{{ request.user.get_full_name }}",
+            "email": "{{ request.user.email }}",
+            "contact": "" // User ka phone number yahan daal sakte hain
+        },
+        "theme": { "color": "#60367c" }
     };
     var rzp1 = new Razorpay(options);
     document.getElementById('pay-btn').onclick = function(e){
@@ -27,3 +92,4 @@
         e.preventDefault();
     }
 </script>
+{% endblock %}

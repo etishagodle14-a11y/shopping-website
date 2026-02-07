@@ -2,154 +2,137 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-<div class="container my-5">
+<div class="container my-4 my-md-5">
     <form action="{% url 'place_order' %}" method="POST" id="mainOrderForm">
         {% csrf_token %}
         
-        <div class="row">
-            <div class="col-md-8">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                
                 <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0" style="color: #60367cff;">1. DELIVERY ADDRESS</h6>
+                    <div class="card-header bg-white py-3">
+                        <h6 class="fw-bold mb-0" style="color: #60367cff;"><i class="bi bi-geo-alt me-2"></i>1. DELIVERY ADDRESS</h6>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">Full Name</label>
-                                <input type="text" name="full_name" class="form-control bg-light border-0" placeholder="Enter your full name" required>
+                                <input type="text" name="full_name" class="form-control bg-light border-0 py-2" placeholder="e.g. Rahul Sharma" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">Phone Number</label>
-                                <input type="text" name="phone" class="form-control bg-light border-0" placeholder="10-digit mobile number" required>
+                                <input type="tel" name="phone" pattern="[0-9]{10}" class="form-control bg-light border-0 py-2" placeholder="10-digit mobile number" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted">Full Address</label>
-                                <textarea name="address" class="form-control bg-light border-0" rows="3" placeholder="H.No, Street, Locality..." required></textarea>
+                                <textarea name="address" class="form-control bg-light border-0" rows="2" placeholder="House No., Building, Street, Area" required></textarea>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted">Pincode</label>
-                                <input type="text" name="pincode" class="form-control bg-light border-0" placeholder="6-digit PIN" required>
+                                <input type="text" name="pincode" pattern="[0-9]{6}" class="form-control bg-light border-0" placeholder="6-digit PIN" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted">City</label>
-                                <input type="text" name="city" class="form-control bg-light border-0" placeholder="City Name" required>
+                                <input type="text" name="city" class="form-control bg-light border-0" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted">State</label>
                                 <select name="state" class="form-select bg-light border-0" required>
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
-                                    <option value="Maharashtra">Maharashtra</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="" selected disabled>Choose...</option>
+                                    <option>Andhra Pradesh</option><option>Bihar</option><option>Delhi</option>
+                                    <option>Gujarat</option><option>Haryana</option><option>Karnataka</option>
+                                    <option>Madhya Pradesh</option><option>Maharashtra</option><option>Punjab</option>
+                                    <option>Rajasthan</option><option>Uttar Pradesh</option><option>West Bengal</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0 text-uppercase" style="color: #60367cff;">2. ORDER SUMMARY ({{ cart_items|length }} ITEMS)</h6>
-                    </div>
-                    <div class="card-body">
-                        {% for item in cart_items %}
-                        <div class="d-flex mb-3 border-bottom pb-3">
-                            <div class="flex-shrink-0" style="width: 70px;">
-                                <img src="{{ item.product.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ item.product.name }}">
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h6 class="mb-0 fw-bold" style="font-size: 0.9rem;">{{ item.product.name }}</h6>
-                                        <p class="text-muted mb-0 small">Qty: {{ item.quantity }} | Price: ₹{{ item.product.price }}</p>
-                                    </div>
-                                    <a href="{% url 'remove_from_cart' item.id %}" class="text-danger text-decoration-none">
-                                        <span style="font-size: 0.8rem;">Remove</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
                 <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0" style="color: #60367cff;">3. PAYMENT OPTIONS</h6>
+                    <div class="card-header bg-white py-3">
+                        <h6 class="fw-bold mb-0" style="color: #60367cff;"><i class="bi bi-credit-card me-2"></i>2. PAYMENT OPTIONS</h6>
                     </div>
                     <div class="card-body p-0">
-                        <div class="p-3">
-                            <div class="form-check mb-3">
+                        <div class="p-3 border-bottom">
+                            <div class="form-check">
                                 <input class="form-check-input" type="radio" name="payment_method" id="upi" value="UPI" checked>
-                                <label class="form-check-label fw-bold" for="upi">Online Payment (UPI)</label>
+                                <label class="form-check-label fw-bold" for="upi">UPI (GPay, PhonePe, Paytm)</label>
                             </div>
                             
-                            <div class="icon-grid" id="upiIcons">
-                                <div class="pay-icon" onclick="handlePayment('GPay')">
-                                    <img src="https://img.icons8.com/color/48/google-pay-india.png" alt="G-Pay"><br><span>G-Pay</span>
+                            <div class="upi-container" id="upiSection">
+                                <div class="icon-grid mt-3">
+                                    <div class="pay-icon" onclick="handlePayment('GPay')">
+                                        <img src="https://img.icons8.com/color/48/google-pay-india.png" alt="GPay">
+                                        <span>G-Pay</span>
+                                    </div>
+                                    <div class="pay-icon" onclick="handlePayment('PhonePe')">
+                                        <img src="https://img.icons8.com/color/48/phonepe.png" alt="PhonePe">
+                                        <span>PhonePe</span>
+                                    </div>
+                                    <div class="pay-icon" onclick="handlePayment('Paytm')">
+                                        <img src="https://img.icons8.com/color/48/paytm.png" alt="Paytm">
+                                        <span>Paytm</span>
+                                    </div>
+                                    <div class="pay-icon" onclick="handlePayment('Amazon')">
+                                        <img src="https://img.icons8.com/color/48/amazon-pay.png" alt="Amazon">
+                                        <span>Amazon</span>
+                                    </div>
                                 </div>
-                                <div class="pay-icon" onclick="handlePayment('PhonePe')">
-                                    <img src="https://img.icons8.com/color/48/phonepe.png" alt="PhonePe"><br><span>PhonePe</span>
+                                <div class="text-center mt-3 p-3 rounded" style="background: #f8f9fa; border: 1px dashed #ccc;">
+                                    <p class="small text-muted mb-2">OR Scan QR Code</p>
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ grand_total }}&cu=INR" width="120">
                                 </div>
-                                <div class="pay-icon" onclick="handlePayment('Paytm')">
-                                    <img src="https://img.icons8.com/color/48/paytm.png" alt="Paytm"><br><span>Paytm</span>
-                                </div>
-                                <div class="pay-icon" onclick="handlePayment('Amazon')">
-                                    <img src="https://img.icons8.com/color/48/amazon-pay.png" alt="Amazon"><br><span>Amazon</span>
-                                </div>
-                            </div>
-
-                            <div class="qr-section mt-3 text-center" id="qrInstruction">
-                                <p class="small text-muted mb-1">Select an app or Scan the QR below</p>
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ grand_total }}&cu=INR" class="img-thumbnail" style="width: 120px;">
                             </div>
                         </div>
-
-                        <hr class="m-0">
 
                         <div class="p-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD">
-                                <label class="form-check-label fw-bold" for="cod">Cash on Delivery</label>
+                                <label class="form-check-label fw-bold" for="cod">Cash on Delivery (COD)</label>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn btn-warning w-100 fw-bold py-3 mb-2 shadow-sm" style="border-radius: 10px; font-size: 1.1rem;">
-                    CONFIRM ORDER
-                </button>
             </div>
 
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
-                    <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0 text-muted">PRICE DETAILS</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Price ({{ cart_items|length }} items)</span>
-                            <span>₹{{ total }}</span>
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 80px;">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="fw-bold mb-0 text-muted">PRICE DETAILS</h6>
                         </div>
-                        <div class="d-flex justify-content-between mb-2 text-success">
-                            <span>Gift Card Discount</span>
-                            <span class="fw-bold">- ₹{{ discount }}</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-3">
-                            <h5 class="fw-bold">Total Payable</h5>
-                            <h5 class="fw-bold" style="color: #60367cff;">₹{{ grand_total }}</h5>
-                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Price ({{ cart_items|length }} items)</span>
+                                <span>₹{{ total }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>Discount</span>
+                                <span class="fw-bold">- ₹{{ discount|default:"0" }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Delivery</span>
+                                <span class="text-success fw-bold">FREE</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5 class="fw-bold">Total Payable</h5>
+                                <h5 class="fw-bold" style="color: #60367cff;">₹{{ grand_total }}</h5>
+                            </div>
 
-                        <div class="mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-warning w-100 fw-bold py-3 shadow-sm" style="background-color: #fb641b; color: white; border: none; border-radius: 4px;">
+                                CONFIRM ORDER
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
                             <label class="small fw-bold text-muted mb-2">HAVE A GIFT CARD?</label>
-                            <div class="d-flex gap-2">
-                                <input type="text" name="gift_card_code" class="form-control bg-light border-0 form-control-sm" placeholder="Enter Code">
-                                <button type="submit" formaction="{% url 'apply_gift_card' %}" class="btn btn-dark btn-sm fw-bold">APPLY</button>
+                            <div class="input-group">
+                                <input type="text" name="gift_card_code" class="form-control form-control-sm" placeholder="Enter Code">
+                                <button class="btn btn-dark btn-sm" type="submit" formaction="{% url 'apply_gift_card' %}">APPLY</button>
                             </div>
                         </div>
                     </div>
@@ -159,89 +142,21 @@
     </form>
 </div>
 
-<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center p-4" style="border-radius: 20px;">
-            <div class="modal-header border-0">
-                <h5 class="modal-title w-100 fw-bold">Scan to Pay with <span id="selectedApp">UPI</span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ grand_total }}&cu=INR" class="img-fluid shadow-sm rounded mb-3" style="max-width: 200px;">
-                <p class="mb-1 fw-bold text-muted">Amount: ₹{{ grand_total }}</p>
-                <p class="small text-muted">Open any UPI app (GPay, PhonePe, etc.) and scan this code.</p>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+{% include 'ebook/includes/qr_modal.html' %} 
 
 <style>
-    .form-control:focus, .form-select:focus { box-shadow: none; border: 1px solid #60367c !important; }
-    .card { border-radius: 12px; }
-    .icon-grid { 
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr); 
-        gap: 10px; 
-        margin-top: 15px;
-        padding: 10px;
-    }
-    .pay-icon { 
-        display: block; 
-        border: 1px solid #ddd; 
-        text-align: center; 
-        padding: 10px 5px; 
-        border-radius: 8px; 
-        background: white;
-        transition: 0.2s;
+    .pay-icon {
+        border: 1.5px solid #eee;
+        border-radius: 10px;
+        padding: 12px 5px;
+        text-align: center;
         cursor: pointer;
+        transition: all 0.2s;
+        background: #fff;
     }
-    .pay-icon:hover { border-color: #60367cff; background: #fdf7ff; }
-    .pay-icon:active { transform: scale(0.95); }
-    .pay-icon img { width: 35px; height: 35px; object-fit: contain; }
-    .pay-icon span { font-size: 10px; font-weight: 600; display: block; margin-top: 5px; }
-    .qr-section { background: #fdf7ff; padding: 12px; border-radius: 10px; border: 1px dashed #d1c4e9; }
+    .pay-icon:hover { border-color: #60367c; background: #fdf7ff; transform: translateY(-2px); }
+    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .pay-icon img { width: 32px; height: 32px; margin-bottom: 5px; }
+    .pay-icon span { font-size: 10px; font-weight: 700; display: block; }
 </style>
-
-<script>
-    const upiRadio = document.getElementById('upi');
-    const codRadio = document.getElementById('cod');
-    const upiSection = document.getElementById('upiIcons');
-    const qrSection = document.getElementById('qrInstruction');
-
-    function togglePayment() {
-        if (upiRadio.checked) {
-            upiSection.style.display = 'grid';
-            qrSection.style.display = 'block';
-        } else {
-            upiSection.style.display = 'none';
-            qrSection.style.display = 'none';
-        }
-    }
-
-    upiRadio.addEventListener('change', togglePayment);
-    codRadio.addEventListener('change', togglePayment);
-
-    function handlePayment(appName) {
-        const upiID = "krishugodle@oksbi"; 
-        const name = "Apna Mart";
-        let amount = parseFloat("{{ grand_total }}").toFixed(2);
-        const note = "Order Payment Apna Mart";
-        
-        const upiUrl = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
-        const isMobile = /Android|iPod|iPhone|iPad/i.test(navigator.userAgent);
-
-        if (isMobile) {
-            window.location.href = upiUrl;
-        } else {
-            document.getElementById('selectedApp').innerText = appName;
-            var myModal = new bootstrap.Modal(document.getElementById('qrModal'));
-            myModal.show();
-        }
-    }
-    
-    togglePayment();
-</script>
 {% endblock %}
