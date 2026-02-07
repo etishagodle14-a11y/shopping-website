@@ -12,7 +12,7 @@
             <div class="col-md-8">
                 <div class="card shadow-sm mb-4 border-0">
                     <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0" style="color: #60367c;">1. DELIVERY ADDRESS</h6>
+                        <h6 class="fw-bold mb-0" style="color: #60367cff;">1. DELIVERY ADDRESS</h6>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
@@ -53,7 +53,7 @@
 
                 <div class="card shadow-sm mb-4 border-0">
                     <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0 text-uppercase" style="color: #60367c;">2. ORDER SUMMARY ({{ cart_items|length }} ITEMS)</h6>
+                        <h6 class="fw-bold mb-0 text-uppercase" style="color: #60367cff;">2. ORDER SUMMARY ({{ cart_items|length }} ITEMS)</h6>
                     </div>
                     <div class="card-body">
                         {% for item in cart_items %}
@@ -79,7 +79,7 @@
 
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white py-3 border-bottom">
-                        <h6 class="fw-bold mb-0" style="color: #60367c;">3. PAYMENT OPTIONS</h6>
+                        <h6 class="fw-bold mb-0" style="color: #60367cff;">3. PAYMENT OPTIONS</h6>
                     </div>
                     <div class="card-body p-0">
                         <div class="p-3">
@@ -142,7 +142,7 @@
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <h5 class="fw-bold">Total Payable</h5>
-                            <h5 class="fw-bold" style="color: #60367c;">₹{{ grand_total }}</h5>
+                            <h5 class="fw-bold" style="color: #60367cff;">₹{{ grand_total }}</h5>
                         </div>
 
                         <div class="mt-4 pt-3 border-top">
@@ -198,7 +198,7 @@
         transition: 0.2s;
         cursor: pointer;
     }
-    .pay-icon:hover { border-color: #60367c; background: #fdf7ff; }
+    .pay-icon:hover { border-color: #60367cff; background: #fdf7ff; }
     .pay-icon:active { transform: scale(0.95); }
     .pay-icon img { width: 35px; height: 35px; object-fit: contain; }
     .pay-icon span { font-size: 10px; font-weight: 600; display: block; margin-top: 5px; }

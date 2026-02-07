@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="card shadow border-0 p-4" style="border-radius: 15px;">
-                <h3 class="text-center fw-bold mb-4" style="color: #60367c;">Create Account</h3>
+                <h3 class="text-center fw-bold mb-4" style="color: #60367cff;">Create Account</h3>
                 
                 <form method="POST">
                     {% csrf_token %}
@@ -28,14 +28,14 @@
                     {% endfor %}
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn text-white fw-bold" style="background-color: #60367c; padding: 10px;">
+                        <button type="submit" class="btn text-white fw-bold" style="background-color: #60367cff; padding: 10px;">
                             SIGN UP
                         </button>
                     </div>
                 </form>
 
                 <p class="text-center mt-3 small">
-                    Already have an account? <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: #60367c;">Login here</a>
+                    Already have an account? <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: #60367cff;">Login here</a>
                 </p>
             </div>
         </div>
@@ -54,7 +54,7 @@
     }
     
     input:focus {
-        border-color: #60367c;
+        border-color: #60367cff;
         box-shadow: 0 0 5px rgba(96, 54, 124, 0.2);
     }
 
