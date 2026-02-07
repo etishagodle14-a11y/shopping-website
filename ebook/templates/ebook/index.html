@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-<div class="card border-0 shadow-sm rounded-0 mb-3 mt-n3 mx-n3">
-    <div class="card-body py-2 px-1">
+<div class="card border-0 shadow-sm rounded-0 mb-3 mt-n3 mx-n3 bg-white">
+    <div class="card-body py-3 px-1">
         <div class="d-flex justify-content-start justify-content-md-center align-items-center category-scroll-container">
             {% for category in categories %}
             <a href="/?category={{ category.name }}" class="text-decoration-none category-card">
@@ -107,9 +107,9 @@
                                             <img src="https://via.placeholder.com/150" class="product-img" alt="Placeholder">
                                         {% endif %}
                                     </div>
-                                    <div class="p-2 border-top">
+                                    <div class="p-2 border-top text-center text-md-start">
                                         <div class="fw-bold small text-truncate-2" style="height: 38px; font-size: 13px;">{{ product.name }}</div>
-                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mt-1">
                                             <span class="text-dark fw-bold">₹{{ product.price }}</span>
                                             {% if product.old_price %}
                                             <small class="text-muted text-decoration-line-through">₹{{ product.old_price }}</small>
@@ -133,39 +133,39 @@
 </div>
 
 <style>
-    /* 1. Improved Category Section */
+    /* 1. Category Section Laptop Look - Bade Icons */
     .category-scroll-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        gap: 20px;
-        padding-bottom: 5px;
-        scrollbar-width: none; /* Firefox */
+        gap: 30px; /* Laptop par door-door icons */
+        scrollbar-width: none;
     }
-    .category-scroll-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+    .category-scroll-container::-webkit-scrollbar { display: none; }
 
     .category-card { 
-        min-width: 100px; 
+        min-width: 120px; /* Laptop par icons ko space milegi */
         text-align: center; 
         flex-shrink: 0; 
-        transition: transform 0.2s;
+        transition: transform 0.2s ease-in-out;
     }
-    .category-card:hover { transform: translateY(-3px); }
+    .category-card:hover { transform: translateY(-5px); }
 
     .category-img-container { 
-        width: 65px; height: 65px; 
+        width: 85px; height: 85px; /* Size bada kiya gaya */
         background: #fff; 
         border-radius: 50%; 
         display: flex; align-items: center; justify-content: center; 
-        margin: 0 auto 8px; 
-        border: 1.5px solid #f8f9fa;
+        margin: 0 auto 10px; 
+        border: 2px solid #f0f0f0;
         transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
     }
     .category-card:hover .category-img-container { border-color: #60367c; background: #fdfbff; }
-    .category-img-container img { width: 40px; height: 40px; object-fit: contain; }
-    .category-name { font-size: 13px; font-weight: 600; color: #444; }
+    .category-img-container img { width: 50px; height: 50px; object-fit: contain; }
+    .category-name { font-size: 14px; font-weight: 600; color: #333; }
 
     /* 2. Responsive Slider */
-    .custom-slider-height { height: 400px; }
+    .custom-slider-height { height: 420px; }
     .slider-bg-wrapper { width: 100%; height: 100%; position: relative; }
     .slider-content-overlay { 
         backdrop-filter: blur(15px); background: rgba(255,255,255,0.1); 
@@ -177,26 +177,25 @@
     /* 3. Product Cards */
     .product-card { border-radius: 8px; transition: 0.3s; overflow: hidden; }
     .shadow-hover:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; transform: translateY(-3px); }
-    .img-wrapper { height: 180px; display: flex; align-items: center; justify-content: center; }
-    .product-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .img-wrapper { height: 200px; display: flex; align-items: center; justify-content: center; }
+    .product-img { max-width: 90%; max-height: 90%; object-fit: contain; }
     .text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* 4. MOBILE SPECIFIC (max-width: 768px) */
+    /* 4. MOBILE ADJUSTMENTS */
     @media (max-width: 768px) { 
-        .category-scroll-container { gap: 10px; }
-        .category-card { min-width: 75px; }
-        .category-img-container { width: 55px; height: 55px; }
-        .category-img-container img { width: 32px; height: 32px; }
+        .category-scroll-container { gap: 15px; }
+        .category-card { min-width: 85px; }
+        .category-img-container { width: 65px; height: 65px; }
+        .category-img-container img { width: 38px; height: 38px; }
         .category-name { font-size: 11px; }
-        .custom-slider-height { height: 180px; }
-        .img-wrapper { height: 140px; }
+        .custom-slider-height { height: 200px; }
+        .img-wrapper { height: 150px; }
     }
 
     .list-group-item.active { background-color: #60367c; border-color: #60367c; }
 </style>
 
 <script>
-    // Timer Logic
     function startTimer(duration, display) {
         var timer = duration, hours, minutes, seconds;
         setInterval(function () {
