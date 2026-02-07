@@ -11,137 +11,175 @@
     
     <style>
         :root { 
-            --flipkart-blue: #60367cff; 
-            --flipkart-yellow: #d67f14ff; 
+            --main-purple: #60367c; 
+            --accent-yellow: #fb641b; 
         }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        .navbar { background-color: var(--flipkart-blue); padding: 8px 0; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f3f6; }
         
-        /* Navigation Links & Icons */
-        .nav-link { color: #ffffff !important; font-weight: 500; transition: 0.3s; position: relative; }
-        .nav-link:hover { color: var(--flipkart-yellow) !important; }
+        /* Navbar Styling */
+        .navbar { background-color: var(--main-purple); padding: 12px 0; }
         
-        .login-btn { 
+        /* Modern Search Bar Fix */
+        .search-container { 
+            background: #fff; 
+            border-radius: 4px; 
+            display: flex; 
+            align-items: center; 
+            width: 100%; 
+            max-width: 560px;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.23);
+        }
+        .custom-search-input { 
+            border: none !important; 
+            padding: 10px 16px; 
+            font-size: 14px; 
+            outline: none !important; 
+            box-shadow: none !important; 
+            width: 100%; 
+            border-radius: 4px 0 0 4px;
+        }
+        .search-btn { background: white; border: none; padding: 0 15px; color: var(--main-purple); border-radius: 0 4px 4px 0; }
+
+        /* Navigation Links */
+        .nav-link-custom { 
+            color: #ffffff !important; 
+            text-decoration: none; 
+            text-align: center; 
+            font-weight: 600; 
+            position: relative;
+            transition: 0.2s;
+        }
+        .nav-link-custom:hover { opacity: 0.8; }
+        .nav-icon-text { font-size: 12px; display: block; margin-top: -2px; }
+
+        /* Login Button */
+        .login-btn-white { 
             background: white; 
-            color: var(--flipkart-blue) !important; 
-            padding: 6px 22px !important; 
+            color: var(--main-purple) !important; 
+            padding: 6px 28px !important; 
             border-radius: 2px; 
-            font-weight: bold; 
-            display: flex;
-            align-items: center;
+            font-weight: 700; 
             text-decoration: none;
             font-size: 15px;
         }
 
-        .search-container { border-radius: 2px; background: white; display: flex; align-items: center; width: 100%; }
-        .custom-search-input { border: none !important; padding: 10px 15px; font-size: 14px; outline: none !important; box-shadow: none !important; width: 100%; }
-        
-        .nav-icon-text { font-size: 11px; font-weight: 700; display: block; margin-top: 2px; text-transform: uppercase; }
-        
-        footer { background: #212121; color: white; padding: 40px 0; margin-top: 50px; }
+        /* Notification Badge */
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff6161;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            border: 2px solid var(--main-purple);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer { background: #212121; color: white; padding: 30px 0; margin-top: 50px; }
 
         /* --- Mobile Bottom Nav --- */
         .mobile-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: #ffffff;
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            border-top: 1px solid #eee;
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #ffffff; display: flex; justify-content: space-around;
+            padding: 8px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1050; border-top: 1px solid #eee;
         }
+        .mobile-nav-item { text-align: center; text-decoration: none; color: #444; flex: 1; }
+        .mobile-nav-item i { font-size: 1.2rem; }
+        .mobile-nav-item span { font-size: 10px; display: block; font-weight: 600; }
+        .mobile-nav-item.active { color: var(--main-purple); }
 
-        .mobile-nav-item {
-            text-align: center;
-            text-decoration: none;
-            color: #444;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        @media (max-width: 991px) {
+            .hide-mobile { display: none !important; }
+            body { padding-bottom: 60px; }
         }
-        .mobile-nav-item i { font-size: 1.3rem; }
-        .mobile-nav-item span { font-size: 0.65rem; font-weight: 600; margin-top: 2px; }
-        .mobile-nav-item:hover, .mobile-nav-item.active { color: var(--flipkart-blue); }
-
-        @media (min-width: 992px) { .mobile-nav { display: none; } }
-        @media (max-width: 991px) { body { padding-bottom: 70px; } }
-
-        /* Category Drawer */
-        .offcanvas-bottom { height: 60vh !important; border-top-left-radius: 20px; border-top-right-radius: 20px; }
+        @media (min-width: 992px) {
+            .hide-desktop { display: none !important; }
+        }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand text-white fw-bold me-4" href="{% url 'product_list' %}" style="font-size: 22px; letter-spacing: 0.5px;">
+    <nav class="navbar sticky-top">
+        <div class="container d-flex align-items-center">
+            <a class="navbar-brand text-white fw-bold me-4" href="/" style="font-size: 22px;">
                 <i>Apna Mart</i>
             </a>
 
-            <div class="flex-grow-1 d-none d-md-block me-4">
+            <div class="flex-grow-1 hide-mobile me-4">
                 <form action="{% url 'product_list' %}" method="GET">
-                    <div class="input-group search-container">
-                        <input type="text" name="q" class="form-control border-0 custom-search-input" placeholder="Search for products, brands and more" value="{{ request.GET.q|default:'' }}">
-                        <button class="btn btn-white border-0 py-0 px-3" type="submit" style="color: #60367c;"><i class="bi bi-search"></i></button>
+                    <div class="search-container">
+                        <input type="text" name="q" class="custom-search-input" placeholder="Search for products, brands and more" value="{{ request.GET.q|default:'' }}">
+                        <button class="search-btn" type="submit"><i class="bi bi-search"></i></button>
                     </div>
                 </form>
             </div>
 
-            <div class="d-flex align-items-center gap-3 gap-lg-4">
+            <div class="d-flex align-items-center gap-3 gap-md-4">
                 
+                <a class="nav-link-custom" href="{% url 'offer_zone' %}">
+                    <i class="bi bi-lightning-fill text-warning fs-5"></i>
+                    <span class="nav-icon-text hide-mobile">Offers</span>
+                </a>
+
                 {% if user.is_authenticated %}
-                <a class="nav-link text-center px-1 d-none d-lg-block" href="{% url 'my_orders' %}">
+                <a class="nav-link-custom hide-mobile" href="{% url 'my_orders' %}">
                     <i class="bi bi-box-seam fs-5"></i>
                     <span class="nav-icon-text">Orders</span>
                 </a>
                 {% endif %}
 
-                <a class="nav-link text-center px-1" href="{% url 'view_wishlist' %}">
+                <a class="nav-link-custom hide-mobile" href="{% url 'view_wishlist' %}">
                     <i class="bi bi-heart fs-5"></i>
                     <span class="nav-icon-text">Wishlist</span>
                 </a>
 
-                <a class="nav-link text-center px-1" href="{% url 'view_cart' %}">
-                    <i class="bi bi-cart3 fs-5"></i>
-                    <span class="nav-icon-text">Cart</span>
+                <a class="nav-link-custom" href="{% url 'view_cart' %}">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    {% if cart_count > 0 %}
+                    <span class="cart-badge">{{ cart_count }}</span>
+                    {% else %}
+                    <span class="cart-badge">0</span>
+                    {% endif %}
+                    <span class="nav-icon-text hide-mobile">Cart</span>
                 </a>
 
                 {% if user.is_authenticated %}
                 <div class="dropdown">
-                    <a class="nav-link dropdown-toggle login-btn shadow-sm" href="#" data-bs-toggle="dropdown">
+                    <a class="login-btn-white dropdown-toggle shadow-sm" href="#" data-bs-toggle="dropdown">
                          {{ user.username|title }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                        <li class="d-lg-none"><a class="dropdown-item py-2" href="{% url 'my_orders' %}"><i class="bi bi-box-seam me-2"></i> My Orders</a></li>
-                        <li><a class="dropdown-item py-2" href="#"><i class="bi bi-person me-2"></i> Profile</a></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'my_orders' %}"><i class="bi bi-bag me-2"></i> My Orders</a></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'view_wishlist' %}"><i class="bi bi-heart me-2"></i> Wishlist</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger py-2" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
                     </ul>
                 </div>
                 {% else %}
-                <a class="login-btn shadow-sm ms-2" href="{% url 'login' %}">Login</a>
+                <a class="login-btn-white shadow-sm" href="{% url 'login' %}">Login</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
-    <div class="container d-md-none mt-2">
+    <div class="container mt-2 hide-desktop">
         <form action="{% url 'product_list' %}" method="GET">
-            <div class="input-group search-container shadow-sm border">
-                <input type="text" name="q" class="form-control border-0 custom-search-input" placeholder="Search for products..." value="{{ request.GET.q|default:'' }}">
-                <button class="btn btn-white border-0" type="submit"><i class="bi bi-search text-muted"></i></button>
+            <div class="search-container shadow-sm border">
+                <input type="text" name="q" class="custom-search-input" placeholder="Search products..." value="{{ request.GET.q|default:'' }}">
+                <button class="search-btn" type="submit"><i class="bi bi-search"></i></button>
             </div>
         </form>
     </div>
 
-    <div class="py-3 py-md-4">
+    <div class="py-2">
         {% if messages %}
             <div class="container">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm small" role="alert">
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -152,30 +190,30 @@
         {% block content %}{% endblock %}
     </div>
 
-    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="categoryDrawer">
-        <div class="offcanvas-header border-bottom py-3">
-            <h5 class="offcanvas-title fw-bold">All Categories</h5>
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="categoryDrawer" style="height: 50vh; border-radius: 20px 20px 0 0;">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold">Categories</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-0">
             <div class="list-group list-group-flush">
-                <a href="/" class="list-group-item list-group-item-action py-3 px-4 fw-medium border-0"><i class="bi bi-grid me-3 text-primary"></i> All Products</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 px-4 fw-medium border-0"><i class="bi bi-phone me-3"></i> Mobiles</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 px-4 fw-medium border-0"><i class="bi bi-laptop me-3"></i> Electronics</a>
-                <a href="#" class="list-group-item list-group-item-action py-3 px-4 fw-medium border-0"><i class="bi bi-watch me-3"></i> Fashion</a>
+                <a href="/" class="list-group-item py-3 px-4 border-0"><i class="bi bi-grid me-3"></i> All Products</a>
+                {% for cat in categories %}
+                <a href="/?category={{ cat.name }}" class="list-group-item py-3 px-4 border-0">{{ cat.name }}</a>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <div class="mobile-nav d-lg-none">
-        <a href="{% url 'product_list' %}" class="mobile-nav-item active">
-            <i class="bi bi-house"></i><span>Home</span>
+    <div class="mobile-nav hide-desktop">
+        <a href="/" class="mobile-nav-item active">
+            <i class="bi bi-house-door"></i><span>Home</span>
         </a>
         <a href="#" class="mobile-nav-item" data-bs-toggle="offcanvas" data-bs-target="#categoryDrawer">
             <i class="bi bi-grid"></i><span>Categories</span>
         </a>
         <a href="{% url 'offer_zone' %}" class="mobile-nav-item">
-            <i class="bi bi-lightning text-warning"></i><span>Offers</span>
+            <i class="bi bi-lightning-charge text-warning"></i><span>Offers</span>
         </a>
         <a href="{% url 'my_orders' %}" class="mobile-nav-item">
             <i class="bi bi-bag-check"></i><span>Orders</span>
@@ -184,28 +222,11 @@
 
     <footer class="text-center">
         <div class="container">
-            <p class="mb-0 fw-bold" style="font-size: 1.1rem; color: #eee;">Apna Mart</p>
+            <p class="mb-0 fw-bold">Apna Mart</p>
             <p class="small text-muted mt-2">&copy; 2026 Apna Mart. All Rights Reserved.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-    // Cart Quantity Logic
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('qty-btn')) {
-            const isPlus = e.target.classList.contains('plus');
-            const productId = e.target.dataset.productId;
-            const input = e.target.parentElement.querySelector('.qty-input');
-            if (input) {
-                let currentQty = parseInt(input.value);
-                if (isPlus) { currentQty++; } 
-                else if (currentQty > 1) { currentQty--; }
-                window.location.href = `/add-to-cart/${productId}/?quantity=${isPlus ? 1 : -1}`;
-            }
-        }
-    });
-    </script>
 </body>
 </html>

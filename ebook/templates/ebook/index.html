@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="card border-0 shadow-sm rounded-0 mb-3 mt-n3 mx-n3 bg-white">
+<div class="card border-0 shadow-sm rounded-0 mb-3 mt-n3 mx-0 bg-white">
     <div class="card-body py-3 px-1">
         <div class="d-flex justify-content-start justify-content-md-center align-items-center category-scroll-container">
             {% for category in categories %}
@@ -23,20 +23,20 @@
 
 {% if not query %}
 <div id="flipkartSlider" class="carousel slide shadow-sm mb-4" data-bs-ride="carousel">
-    <div class="carousel-inner rounded-2">
+    <div class="carousel-inner rounded-0 rounded-md-2">
         {% if sliders %}
             {% for slider in sliders %}
             <div class="carousel-item {% if forloop.first %}active{% endif %} custom-slider-height">
                 <div class="slider-bg-wrapper" style="background: url('{{ slider.image.url }}') center/cover no-repeat;">
                     <div class="slider-content-overlay">
-                        <img src="{{ slider.image.url }}" class="slider-main-img">
+                        <img src="{{ slider.image.url }}" class="slider-main-img" alt="Banner Image">
                     </div>
                 </div>
             </div>
             {% endfor %}
         {% else %}
             <div class="carousel-item active custom-slider-height">
-                <img src="https://via.placeholder.com/1200x400?text=Add+Slider+From+Admin" class="d-block w-100 h-100" style="object-fit: cover;">
+                <img src="https://via.placeholder.com/1200x400?text=Apna+Mart+Special+Deals" class="d-block w-100 h-100" style="object-fit: cover;">
             </div>
         {% endif %}
     </div>
@@ -49,17 +49,23 @@
 </div>
 {% endif %}
 
-<div class="container-fluid px-2 px-md-3">
+<div class="container-fluid px-2 px-md-4">
     <div class="row">
         <div class="col-md-3 d-none d-md-block">
-            <div class="card border-0 shadow-sm rounded-0 sticky-top" style="top: 80px; z-index: 100;">
-                <div class="card-header bg-white fw-bold border-bottom py-3 text-uppercase">Filters & Categories</div>
+            <div class="card border-0 shadow-sm rounded-0 sticky-top" style="top: 90px; z-index: 100;">
+                <div class="card-header bg-white fw-bold border-bottom py-3 text-uppercase" style="font-size: 14px; color: #666;">
+                    Filters & Categories
+                </div>
                 <div class="list-group list-group-flush">
-                    <a href="/" class="list-group-item list-group-item-action {% if not selected_category and not query %}active{% endif %}">All Products</a>
+                    <a href="/" class="list-group-item list-group-item-action {% if not selected_category and not query %}active{% endif %}">
+                        All Products
+                    </a>
                     {% for cat in categories %}
-                    <a href="/?category={{ cat.name }}" class="list-group-item list-group-item-action {% if selected_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
+                    <a href="/?category={{ cat.name }}" class="list-group-item list-group-item-action {% if selected_category == cat.name %}active{% endif %}">
+                        {{ cat.name }}
+                    </a>
                     {% endfor %}
-                    <a href="{% url 'offer_zone' %}" class="list-group-item list-group-item-action fw-bold text-warning">
+                    <a href="{% url 'offer_zone' %}" class="list-group-item list-group-item-action fw-bold text-danger">
                         <i class="bi bi-lightning-fill"></i> Special Offer Zone
                     </a>
                 </div>
@@ -67,27 +73,27 @@
         </div>
 
         <div class="col-md-9 col-12">
+            {% if query %}
             <div class="mb-3">
-                {% if query %}
-                    <h5 class="fw-bold">Search: "{{ query }}" <small class="text-muted">({{ products.count }})</small></h5>
-                {% endif %}
+                <h5 class="fw-bold">Showing results for "{{ query }}" <small class="text-muted">({{ products.count }})</small></h5>
             </div>
+            {% endif %}
 
             <div class="card border-0 shadow-sm rounded-0 mb-4">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-2 py-md-3 border-bottom">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
                     <div>
-                        <h6 class="mb-0 fw-bold">
+                        <h6 class="mb-0 fw-bold text-uppercase">
                             {% if selected_category %} {{ selected_category }} 
                             {% elif query %} Search Results 
-                            {% else %} Deals of the Day {% endif %}
+                            {% else %} <i class="bi bi-stars text-warning"></i> Deals of the Day {% endif %}
                         </h6>
                         {% if not query %}
                         <small class="text-muted" style="font-size: 11px;">
-                            <i class="bi bi-clock"></i> <span id="deal-timer" class="fw-bold text-danger">00h 00m 00s</span>
+                            Time Left: <span id="deal-timer" class="fw-bold text-danger">00h 00m 00s</span>
                         </small>
                         {% endif %}
                     </div>
-                    <a href="{% url 'all_products' %}" class="btn btn-primary btn-sm px-3 fw-bold rounded-1 text-white">VIEW ALL</a>
+                    <a href="{% url 'all_products' %}" class="btn btn-primary btn-sm px-4 fw-bold rounded-1 shadow-sm text-white border-0" style="background-color: #60367c;">VIEW ALL</a>
                 </div>
                 
                 <div class="card-body p-2 p-md-3">
@@ -96,7 +102,7 @@
                         <div class="col">
                             <div class="product-card border h-100 position-relative bg-white shadow-hover">
                                 <a href="{% url 'toggle_wishlist' product.id %}" class="position-absolute top-0 end-0 m-2 text-decoration-none" style="z-index: 5;">
-                                    <i class="bi bi-heart-fill {% if product.id in wishlist_ids %}text-danger{% else %}text-muted{% endif %}" style="font-size: 1.1rem;"></i>
+                                    <i class="bi bi-heart-fill {% if product.id in wishlist_ids %}text-danger{% else %}text-muted{% endif %}" style="font-size: 1.1rem; filter: drop-shadow(0 0 2px rgba(255,255,255,0.8));"></i>
                                 </a>
 
                                 <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark d-block h-100">
@@ -104,12 +110,14 @@
                                         {% if product.image %}
                                             <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
                                         {% else %}
-                                            <img src="https://via.placeholder.com/150" class="product-img" alt="Placeholder">
+                                            <img src="https://via.placeholder.com/200" class="product-img" alt="Placeholder">
                                         {% endif %}
                                     </div>
-                                    <div class="p-2 border-top text-center text-md-start">
-                                        <div class="fw-bold small text-truncate-2" style="height: 38px; font-size: 13px;">{{ product.name }}</div>
-                                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mt-1">
+                                    <div class="p-2 border-top">
+                                        <div class="fw-bold small text-truncate-2 mb-1" style="height: 38px; font-size: 13px; line-height: 1.4;">
+                                            {{ product.name }}
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
                                             <span class="text-dark fw-bold">₹{{ product.price }}</span>
                                             {% if product.old_price %}
                                             <small class="text-muted text-decoration-line-through">₹{{ product.old_price }}</small>
@@ -122,7 +130,7 @@
                         {% empty %}
                         <div class="col-12 text-center py-5">
                             <i class="bi bi-search text-muted display-1"></i>
-                            <h5 class="text-muted mt-3">Koi product nahi mila!</h5>
+                            <h5 class="text-muted mt-3">Maaf kijiye, koi product nahi mila!</h5>
                         </div>
                         {% endfor %}
                     </div>
@@ -133,69 +141,71 @@
 </div>
 
 <style>
-    /* 1. Category Section Laptop Look - Bade Icons */
+    /* CATEGORY STYLING - Laptop par bade icons aur center alignment */
     .category-scroll-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        gap: 30px; /* Laptop par door-door icons */
+        gap: 40px; /* Laptop gap */
         scrollbar-width: none;
     }
     .category-scroll-container::-webkit-scrollbar { display: none; }
 
     .category-card { 
-        min-width: 120px; /* Laptop par icons ko space milegi */
+        min-width: 100px;
         text-align: center; 
         flex-shrink: 0; 
-        transition: transform 0.2s ease-in-out;
+        transition: 0.3s;
     }
-    .category-card:hover { transform: translateY(-5px); }
 
     .category-img-container { 
-        width: 85px; height: 85px; /* Size bada kiya gaya */
+        width: 85px; height: 85px; /* Laptop Size */
         background: #fff; 
         border-radius: 50%; 
         display: flex; align-items: center; justify-content: center; 
         margin: 0 auto 10px; 
-        border: 2px solid #f0f0f0;
+        border: 2px solid #f8f9fa;
         transition: 0.3s;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06) !important;
     }
-    .category-card:hover .category-img-container { border-color: #60367c; background: #fdfbff; }
-    .category-img-container img { width: 50px; height: 50px; object-fit: contain; }
-    .category-name { font-size: 14px; font-weight: 600; color: #333; }
+    
+    .category-card:hover .category-img-container { 
+        transform: scale(1.08);
+        border-color: #60367c; 
+        box-shadow: 0 6px 15px rgba(96, 54, 124, 0.15) !important;
+    }
 
-    /* 2. Responsive Slider */
-    .custom-slider-height { height: 420px; }
+    .category-img-container img { width: 50px; height: 50px; object-fit: contain; }
+    .category-name { font-size: 14px; font-weight: 700; color: #212121; }
+
+    /* SLIDER & GRID */
+    .custom-slider-height { height: 400px; }
     .slider-bg-wrapper { width: 100%; height: 100%; position: relative; }
-    .slider-content-overlay { 
-        backdrop-filter: blur(15px); background: rgba(255,255,255,0.1); 
-        width: 100%; height: 100%; 
-        display: flex; align-items: center; justify-content: center; 
-    }
+    .slider-content-overlay { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     .slider-main-img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* 3. Product Cards */
-    .product-card { border-radius: 8px; transition: 0.3s; overflow: hidden; }
-    .shadow-hover:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; transform: translateY(-3px); }
-    .img-wrapper { height: 200px; display: flex; align-items: center; justify-content: center; }
-    .product-img { max-width: 90%; max-height: 90%; object-fit: contain; }
-    .text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-card { border-radius: 4px; transition: 0.3s; overflow: hidden; }
+    .shadow-hover:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.12) !important; transform: translateY(-3px); }
+    .img-wrapper { height: 180px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .product-img { max-width: 90%; max-height: 90%; object-fit: contain; transition: 0.4s; }
+    .product-card:hover .product-img { transform: scale(1.05); }
 
-    /* 4. MOBILE ADJUSTMENTS */
+    /* MOBILE ADJUSTMENTS - Wahi purana look mobile ke liye */
     @media (max-width: 768px) { 
         .category-scroll-container { gap: 15px; }
-        .category-card { min-width: 85px; }
-        .category-img-container { width: 65px; height: 65px; }
-        .category-img-container img { width: 38px; height: 38px; }
+        .category-card { min-width: 75px; }
+        .category-img-container { width: 62px; height: 62px; }
+        .category-img-container img { width: 35px; height: 35px; }
         .category-name { font-size: 11px; }
-        .custom-slider-height { height: 200px; }
-        .img-wrapper { height: 150px; }
+        .custom-slider-height { height: 180px; }
+        .img-wrapper { height: 140px; }
+        .sticky-top { top: 0 !important; }
     }
 
     .list-group-item.active { background-color: #60367c; border-color: #60367c; }
 </style>
 
 <script>
+    // Deal Timer Logic
     function startTimer(duration, display) {
         var timer = duration, hours, minutes, seconds;
         setInterval(function () {
@@ -210,7 +220,7 @@
     }
     window.onload = function () {
         var display = document.querySelector('#deal-timer');
-        if(display) startTimer((19 * 3600) + (20 * 60), display);
+        if(display) startTimer((14 * 3600) + (45 * 60), display);
     };
 </script>
 {% endblock %}
