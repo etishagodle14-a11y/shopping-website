@@ -15,11 +15,9 @@ urlpatterns = [
     
     # --- Cart & Wishlist ---
     path('cart/', views.view_cart, name='view_cart'),
+    path('update_item/', views.update_item, name='update_item'), # AJAX Update
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('remove-from-cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
-    
-    # Ye raha quantity update karne ka path
-    path('update-cart/<int:product_id>/<str:action>/', views.update_cart_quantity, name='update_cart_quantity'),
     
     path('wishlist/', views.view_wishlist, name='view_wishlist'),
     path('wishlist/toggle/<int:product_id>/', views.toggle_wishlist, name='toggle_wishlist'),

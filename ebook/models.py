@@ -89,7 +89,7 @@ class ShippingAddress(models.Model):
 class Order(models.Model):
     PAYMENT_CHOICES = (
         ('COD', 'Cash on Delivery'),
-        ('UPI', 'UPI Payment'),  # views.py ke hisab se 'Online' ko 'UPI' kar diya hai
+        ('UPI', 'UPI Payment'),
     )
     
     STATUS_CHOICES = (
@@ -101,11 +101,10 @@ class Order(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    order_id = models.CharField(max_length=100, unique=True) # Unique add kiya hai
-    amount = models.DecimalField(max_digits=10, decimal_places=2) # Float se Decimal behtar hai money ke liye
+    order_id = models.CharField(max_length=100, unique=True) # Unique ID for secure cancellation
+    amount = models.DecimalField(max_digits=10, decimal_places=2) 
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='COD')
     
-    # Address Fields
     full_name = models.CharField(max_length=200, null=True, blank=True)
     phone = models.CharField(max_length=15, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
