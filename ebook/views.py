@@ -330,3 +330,9 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('product_list')
+
+@login_required
+def remove_from_checkout(request, item_id):
+    item = get_object_or_404(CartItem, id=item_id, user=request.user)
+    item.delete()
+    return redirect('checkout')
