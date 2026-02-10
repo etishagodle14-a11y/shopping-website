@@ -15,7 +15,7 @@ urlpatterns = [
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('remove-from-cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('update-item/', views.update_item, name='update_item'),
-    path('wishlist/', views.view_wishlist, name='view_wishlist'),
+    path('wishlist/', views.view_wishlist, name='wishlist'),
     # Wishlist (Dono naam support karne ke liye)
     path('toggle-wishlist/<int:product_id>/', views.toggle_wishlist, name='toggle_wishlist'),
     path('add-to-wishlist/<int:product_id>/', views.toggle_wishlist, name='add_to_wishlist'),
