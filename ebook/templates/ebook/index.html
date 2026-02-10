@@ -2,16 +2,16 @@
 {% block content %}
 
 <div class="container-fluid bg-white py-3 mb-2 shadow-sm border-bottom">
-    <div class="d-flex overflow-auto hide-scrollbar text-center px-2" style="gap: 20px;">
+    <div class="container d-flex flex-md-wrap justify-content-md-center overflow-auto hide-scrollbar text-center px-2" id="categoryContainer">
         {% for cat in categories %}
-        <div style="min-width: 75px; flex-shrink: 0;">
+        <div class="category-wrapper" style="flex-shrink: 0;">
             <a href="{% url 'category_products' cat.slug %}" class="text-decoration-none">
-                <div class="rounded-circle border p-1 mb-1 shadow-sm category-icon-wrapper" style="width: 65px; height: 65px; margin: 0 auto; background: #fff; transition: 0.3s;">
+                <div class="category-img-container shadow-sm mb-1" style="background: #fff; margin: 0 auto; transition: 0.3s; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     {% if cat.image %}
-                        <img src="{{ cat.image.url }}" class="img-fluid rounded-circle" style="object-fit: contain; width: 100%; height: 100%;">
+                        <img src="{{ cat.image.url }}" class="img-fluid" style="object-fit: contain; width: 100%; height: 100%;">
                     {% endif %}
                 </div>
-                <span class="text-dark fw-bold d-block text-truncate" style="font-size: 11px;">{{ cat.name }}</span>
+                <span class="text-dark fw-bold d-block category-text">{{ cat.name }}</span>
             </a>
         </div>
         {% endfor %}
@@ -83,40 +83,34 @@
 </div>
 
 <style>
-    /* Slider Height for Desktop and Mobile */
-    .hero-img { height: 350px; object-fit: cover; }
-    
-    @media (max-width: 768px) {
-        .hero-img { height: 160px !important; }
-        .product-card { padding: 10px !important; }
-    }
-
-    /* Horizontal Scroll Magic */
+    /* Common Utilities */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .category-icon-wrapper:hover {
-        border-color: #51295a !important;
-        transform: scale(1.05);
+    .product-card { transition: 0.3s; border-radius: 4px !important; }
+    .product-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+
+    .btn-orange { background-color: #fb641b; border: none; border-radius: 2px; transition: 0.3s; }
+    .btn-orange:hover { background-color: #f4511e; color: white; }
+
+    /* --- LAPTOP/DESKTOP STYLING (min-width: 992px) --- */
+    @media (min-width: 992px) {
+        #categoryContainer { gap: 35px !important; }
+        .category-wrapper { min-width: 90px; }
+        .category-img-container { width: 85px; height: 85px; border-radius: 50%; padding: 10px; border: 2px solid #f8f9fa; }
+        .category-text { font-size: 14px; margin-top: 5px; }
+        .category-wrapper:hover .category-img-container { border-color: #51295a; transform: scale(1.1); }
+        .hero-img { height: 350px; object-fit: cover; }
     }
 
-    .product-card { 
-        transition: 0.3s; 
-        border-radius: 4px !important; 
-    }
-    .product-card:hover { 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; 
-    }
-
-    .btn-orange {
-        background-color: #fb641b;
-        border: none;
-        border-radius: 2px;
-        transition: 0.3s;
-    }
-    .btn-orange:hover {
-        background-color: #f4511e;
-        color: white;
+    /* --- MOBILE STYLING (max-width: 991px) --- */
+    @media (max-width: 991px) {
+        #categoryContainer { gap: 15px !important; }
+        .category-wrapper { min-width: 75px; }
+        .category-img-container { width: 65px; height: 65px; border-radius: 50%; padding: 5px; border: 1px solid #eee; }
+        .category-text { font-size: 11px; }
+        .hero-img { height: 160px !important; }
+        .product-card { padding: 10px !important; }
     }
 </style>
 
