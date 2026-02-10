@@ -2,62 +2,42 @@
 {% block content %}
 
 <style>
-    /* Global Styles */
     body { background-color: #f1f3f6; }
     .card { border: none; border-radius: 8px; }
     
     /* Payment Card Styling */
     .payment-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        text-align: center;
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 85px;
-        position: relative;
+        border: 1px solid #ddd; border-radius: 10px; padding: 12px;
+        cursor: pointer; transition: all 0.2s; text-align: center;
+        background: #fff; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; min-height: 85px;
     }
     
     .payment-radio-hidden { display: none; }
-    
     input[type="radio"]:checked + .payment-card {
-        border: 2px solid #51295a;
-        background: #fdf7ff;
+        border: 2px solid #51295a; background: #fdf7ff;
     }
 
     .payment-card img { height: 22px; margin-bottom: 8px; object-fit: contain; }
     .payment-card i { font-size: 24px; margin-bottom: 5px; color: #555; }
     
-    /* Mobile Fixed Bottom Section */
+    /* Mobile Fixed Bottom Section - Fixed for visibility */
     @media (max-width: 768px) {
         .mobile-fixed-btn {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 12px 15px;
-            background: white;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
-            z-index: 2005; /* Bottom Nav se upar rakhne ke liye */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            position: fixed; bottom: 55px; /* Base Nav ke upar */
+            left: 0; right: 0; padding: 12px 15px;
+            background: white; box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            z-index: 2005; display: flex; align-items: center; justify-content: space-between;
         }
-        body { padding-bottom: 120px !important; } 
+        body { padding-bottom: 140px !important; } 
     }
 
     @media (min-width: 769px) {
         .sticky-summary { position: sticky; top: 85px; }
-        .price-info-mobile { display: none; }
     }
 
     .btn-orange { background-color: #fb641b; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 8px; }
-    .btn-success { background-color: #28a745; border: none; font-weight: bold; padding: 12px; border-radius: 8px; }
+    .btn-success { background-color: #28a745; color: white; border: none; font-weight: bold; padding: 12px; border-radius: 8px; }
 </style>
 
 <div class="container py-4">
@@ -74,30 +54,20 @@
                         <input type="hidden" name="transaction_id" id="transaction_id_input">
 
                         <div class="row g-3">
-                            <div class="col-md-12">
-                                <input type="text" name="full_name" class="form-control" required placeholder="Full Name">
-                            </div>
-                            <div class="col-6">
-                                <input type="text" name="phone" class="form-control" required placeholder="10-digit mobile number">
-                            </div>
-                            <div class="col-6">
-                                <input type="text" name="pincode" class="form-control" required placeholder="Pincode">
-                            </div>
-                            <div class="col-12">
-                                <textarea name="address" class="form-control" rows="2" required placeholder="Address (Area and Street)"></textarea>
-                            </div>
-                            <div class="col-6">
-                                <input type="text" name="city" class="form-control" required placeholder="City/District/Town">
-                            </div>
+                            <div class="col-md-12"><input type="text" name="full_name" class="form-control" required placeholder="Full Name"></div>
+                            <div class="col-6"><input type="text" name="phone" class="form-control" required placeholder="10-digit mobile number"></div>
+                            <div class="col-6"><input type="text" name="pincode" class="form-control" required placeholder="Pincode"></div>
+                            <div class="col-12"><textarea name="address" class="form-control" rows="2" required placeholder="Address (Area and Street)"></textarea></div>
+                            <div class="col-6"><input type="text" name="city" class="form-control" required placeholder="City/Town"></div>
                             <div class="col-6">
                                 <select class="form-select" name="state" required>
                                     <option value="" selected disabled>State</option>
                                     <option value="Madhya Pradesh">Madhya Pradesh</option>
                                     <option value="Maharashtra">Maharashtra</option>
-                                    <option value="Delhi">Delhi</option>
-                                    <option value="Rajasthan">Rajasthan</option>
                                     <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="Rajasthan">Rajasthan</option>
                                     <option value="Gujrat">Gujrat</option>
+                                    <option value="Delhi">Delhi</option>
                                 </select>
                             </div>
                         </div>
@@ -109,10 +79,7 @@
                             <div class="col-6 col-md-3">
                                 <label class="w-100">
                                     <input type="radio" name="payment_method" value="COD" class="payment-radio-hidden" checked onclick="togglePaymentUI('COD')">
-                                    <div class="payment-card">
-                                        <i class="bi bi-cash-stack"></i>
-                                        <div class="small fw-bold">COD</div>
-                                    </div>
+                                    <div class="payment-card"><i class="bi bi-cash-stack"></i><div class="small fw-bold">COD</div></div>
                                 </label>
                             </div>
                             <div class="col-6 col-md-3">
@@ -145,14 +112,15 @@
                         </div>
 
                         <div class="mobile-fixed-btn">
-                            <div class="price-info-mobile">
-                                <h5 class="mb-0 fw-bold text-dark">₹{{ grand_total }}</h5>
-                                <small class="text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#priceDetails">View Details</small>
+                            <div class="d-md-none">
+                                <h5 class="mb-0 fw-bold">₹{{ grand_total }}</h5>
+                                <small class="text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#priceDetails">View Summary</small>
                             </div>
-                            <button type="submit" id="main-submit-btn" class="btn btn-orange px-4">PLACE ORDER</button>
-                            <button type="button" id="upi-pay-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success px-4">PAY NOW</button>
+                            <button type="submit" id="main-submit-btn" class="btn btn-orange px-5">PLACE ORDER</button>
+                            <button type="button" id="upi-pay-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success px-5">PAY NOW</button>
                         </div>
                     </form>
+
                     <div id="upi-confirm-section" style="display:none;" class="alert alert-info mt-4 text-center">
                         <p class="mb-2 small fw-bold">Payment complete karne ke baad neeche click karein:</p>
                         <button type="button" onclick="finalizeOrder()" class="btn btn-dark btn-sm w-100">Yes, I Have Paid</button>
@@ -173,7 +141,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Delivery Charges</span>
-                        <span class="text-success">{% if delivery_charge > 0 %}₹{{ delivery_charge }}{% else %}FREE{% endif %}</span>
+                        <span class="text-success">FREE</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between align-items-center">
@@ -190,7 +158,7 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content text-center p-4">
             <h6 class="fw-bold mb-3">Scan to Pay ₹{{ grand_total }}</h6>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=krishugodle@oksbi%26pn=ApnaMart%26am={{ grand_total }}%26cu=INR" class="mb-3">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=krishugodle@oksbi%26pn=ApnaMart%26am={{ grand_total }}%26cu=INR" class="mb-3 w-100">
             <button type="button" onclick="finalizeOrder()" class="btn btn-success w-100">I Have Paid</button>
         </div>
     </div>
@@ -215,7 +183,8 @@ function handlePayment() {
         window.location.href = upiUrl;
         document.getElementById('upi-confirm-section').style.display = 'block';
     } else {
-        new bootstrap.Modal(document.getElementById('qrModal')).show();
+        var myModal = new bootstrap.Modal(document.getElementById('qrModal'));
+        myModal.show();
     }
 }
 
