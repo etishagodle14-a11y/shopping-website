@@ -1,17 +1,42 @@
 from django.contrib import admin
 from django.utils.html import format_html
-# Sabhi models ko sahi se import kiya gaya hai
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils import timezone
+from django.core.cache import cache
+
+# Apne models import karein
 from .models import Product, Category, CartItem, Order, OrderItem, Wishlist, Slider
 
 # ==========================================
-# 1. BASIC MODELS REGISTRATION
+# 1. CUSTOM USER ADMIN (With Live Status)
+# ==========================================
+admin.site.unregister(User)
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    # Live Online Status Check
+    def is_online(self, obj):
+        last_seen = cache.get(f'seen_{obj.id}')
+        if last_seen and (timezone.now() - last_seen).seconds < 300:
+            return format_html('<b style="color:green;">● Online</b>')
+        return format_html('<b style="color:red;">○ Offline</b>')
+    
+    is_online.short_description = 'Live Status'
+
+    # Admin list mein columns set karein
+    list_display = ('username', 'email', 'is_staff', 'is_online', 'last_login')
+    ordering = ('-last_login',)
+
+# ==========================================
+# 2. BASIC MODELS REGISTRATION
 # ==========================================
 admin.site.register(Slider)
 admin.site.register(CartItem)
 admin.site.register(Wishlist)
 
 # ==========================================
-# 2. CATEGORY ADMIN
+# 3. CATEGORY ADMIN
 # ==========================================
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -19,11 +44,10 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 # ==========================================
-# 3. ADVANCED PRODUCT ADMIN
+# 4. ADVANCED PRODUCT ADMIN
 # ==========================================
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    # Thumbnail dikhane ke liye helper function
     def thumbnail(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="width: 45px; height:45px; border-radius: 5px; object-fit: cover;" />', obj.image.url)
@@ -37,9 +61,8 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 # ==========================================
-# 4. PRO ORDER ADMIN
+# 5. PRO ORDER ADMIN (With Order Items Inline)
 # ==========================================
-# OrderItem ko Order ke andar hi dikhane ke liye Inline use kiya hai
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
@@ -47,62 +70,56 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    inlines = [OrderItemInline] # Order ke andar hi items dikhenge
+    inlines = [OrderItemInline]
     
     list_display = (
         'order_id', 
         'customer_info', 
         'amount_display', 
-        'status', 
         'status_colored', 
         'is_paid', 
         'payment_method',
         'created_at'
     )
     
-    list_editable = ('status', 'is_paid') 
+    list_editable = ('is_paid',) 
     list_filter = ('status', 'is_paid', 'payment_method', 'created_at')
     search_fields = ('order_id', 'full_name', 'phone', 'user__username')
     ordering = ('-created_at',)
     list_per_page = 15
 
-    # Customer details format
     def customer_info(self, obj):
         return format_html('<b>{}</b><br><small>{}</small>', obj.full_name, obj.phone)
     customer_info.short_description = 'Customer'
 
-    # Amount format
     def amount_display(self, obj):
         return format_html('<span style="font-weight: bold;">₹{}</span>', obj.amount)
     amount_display.short_description = 'Total Amount'
 
-    # Status color coding (Visualization ke liye)
     def status_colored(self, obj):
         colors = {
-            'Pending': '#ff9800',   # Orange
-            'Packed': '#2196f3',    # Blue
-            'Shipped': '#9c27b0',   # Purple
-            'Delivered': '#4caf50', # Green
-            'Cancelled': '#f44336', # Red
+            'Pending': '#ff9800', 
+            'Packed': '#2196f3',
+            'Shipped': '#9c27b0',
+            'Delivered': '#4caf50',
+            'Cancelled': '#f44336',
         }
         color = colors.get(obj.status, '#000')
         return format_html('<span style="color: {}; font-weight: bold;">● {}</span>', color, obj.status)
-    status_colored.short_description = 'Status Indicator'
+    status_colored.short_description = 'Status'
 
-    # Bulk Action: Ek saath sabko paid mark karne ke liye
     actions = ['mark_as_paid']
     def mark_as_paid(self, request, queryset):
         queryset.update(is_paid=True)
-        self.message_user(request, "Selected orders have been marked as Paid.")
+        self.message_user(request, "Selected orders marked as Paid.")
     mark_as_paid.short_description = "Mark selected as Paid"
 
-# OrderItem ko alag se bhi register kar diya agar zarurat ho
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'price', 'quantity']
 
 # ==========================================
-# 5. CUSTOMIZING ADMIN PANEL LOOK
+# 6. CUSTOMIZING ADMIN PANEL LOOK
 # ==========================================
 admin.site.site_header = "Apna Mart Admin"
 admin.site.site_title = "Apna Mart Portal"
