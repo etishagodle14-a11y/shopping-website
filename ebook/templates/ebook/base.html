@@ -16,7 +16,7 @@
         .header-flex { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .logo { font-size: 22px; font-weight: 800; color: white; text-decoration: none; font-style: italic; min-width: 140px; }
         
-        .search-container { background: white; border-radius: 4px; display: flex; align-items: center; padding: 0 15px; height: 38px; flex-grow: 1; max-width: 600px; }
+        .search-container { background: white; border-radius: 4px; display: flex; align-items: center; padding: 0 15px; height: 38px; flex-grow: 1; max-width: 600px; transition: 0.3s; }
         .search-input { border: none; width: 100%; outline: none; font-size: 14px; }
 
         /* Notification Badge Styling */
@@ -33,22 +33,56 @@
         .nav-icon-item { color: white; text-decoration: none; text-align: center; font-size: 12px; font-weight: 500; position: relative; }
         .nav-icon-item i { font-size: 20px; display: block; }
 
-        /* Mobile Bottom Nav */
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; background: white; 
-            display: none; justify-content: space-around; padding: 8px 0; 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 3000; border-top: 1px solid #eee; 
+        /* Flipkart Style Orange Button */
+        .btn-orange {
+            background-color: #fb641b; 
+            border: none;
+            border-radius: 2px;
+            padding: 8px;
+            transition: 0.3s;
+            color: white !important;
         }
-        .bottom-nav-item { text-decoration: none; color: #666; font-size: 10px; text-align: center; flex: 1; position: relative; }
-        .bottom-nav-item i { font-size: 22px; display: block; }
-        .bottom-nav-item.active { color: #51295a; font-weight: bold; }
-        
+        .btn-orange:hover {
+            background-color: #f4511e;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* --- Mobile Responsive UI Updates (Merged) --- */
         @media (max-width: 991px) {
             .header-icons { display: none; } 
-            .bottom-nav { display: flex; }
-            body { padding-bottom: 70px !important; } 
+            .bottom-nav { display: flex !important; }
+            body { padding-bottom: 75px !important; } 
             .logo { font-size: 18px; min-width: auto; }
+
+            /* Premium Search Bar for Mobile */
+            .search-container {
+                margin: 8px 10px;
+                border-radius: 24px; /* Pill shape */
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                border: 1px solid #eee;
+                height: 42px;
+            }
+            .fk-navbar { padding: 5px 0; }
         }
+
+        /* --- App-Like Bottom Navigation (Merged) --- */
+        .bottom-nav { 
+            position: fixed; bottom: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.95); /* Semi-transparent */
+            backdrop-filter: blur(10px); /* Glassmorphism */
+            display: none; justify-content: space-around; padding: 10px 0; 
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 3000; 
+            border-top: 1px solid rgba(0,0,0,0.05); 
+            height: 65px;
+        }
+        .bottom-nav-item { text-decoration: none; color: #666; font-size: 10px; text-align: center; flex: 1; position: relative; transition: 0.3s; }
+        .bottom-nav-item i { font-size: 22px; display: block; transition: 0.3s; }
+        
+        /* Active State with Floating Effect */
+        .bottom-nav-item.active { color: #fb641b; font-weight: bold; }
+        .bottom-nav-item.active i { transform: translateY(-5px); color: #fb641b; }
+
     </style>
 </head>
 <body>
@@ -60,6 +94,7 @@
             
             <form action="{% url 'all_products' %}" method="GET" class="search-container">
                 <input type="text" name="q" class="search-input" placeholder="Search products...">
+                <i class="bi bi-search text-muted"></i>
             </form>
 
             <div class="header-icons">
@@ -93,13 +128,13 @@
     
     <a href="{% url 'wishlist' %}" class="bottom-nav-item">
         <i class="bi bi-heart"></i>
-        {% if wishlist_count > 0 %}<span class="badge-notify" style="top: -2px; right: 15px;">{{ wishlist_count }}</span>{% endif %}
+        {% if wishlist_count > 0 %}<span class="badge-notify" style="top: -2px; right: 20%;">{{ wishlist_count }}</span>{% endif %}
         Wishlist
     </a>
 
     <a href="{% url 'view_cart' %}" class="bottom-nav-item">
         <i class="bi bi-cart3"></i>
-        {% if cart_count > 0 %}<span class="badge-notify" style="top: -2px; right: 15px;">{{ cart_count }}</span>{% endif %}
+        {% if cart_count > 0 %}<span class="badge-notify" style="top: -2px; right: 20%;">{{ cart_count }}</span>{% endif %}
         Cart
     </a>
 
