@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header text-white p-4 text-center" style="background-color: #60367c;">
+                <div class="card-header text-white p-4 text-center" style="background-color: #60377cff;">
                     <i class="bi bi-shield-lock-fill fs-1"></i>
                     <h3 class="fw-bold mt-2">Secure Checkout</h3>
                     <p class="mb-0 opacity-75 small">Order ID: #{{ order_id }}</p>
@@ -30,7 +30,7 @@
 
                     <div class="d-grid gap-2">
                         <button id="pay-btn" class="btn btn-lg text-white fw-bold py-3 rounded-pill shadow-sm" 
-                                style="background: linear-gradient(90deg, #60367c 0%, #8e44ad 100%); border: none;">
+                                style="background: linear-gradient(90deg, #60377cff 0%, #8e44ad 100%); border: none;">
                             PROCEED TO PAY ₹{{ amount_display }}
                         </button>
                     </div>
@@ -84,7 +84,7 @@
             "email": "{{ request.user.email }}",
             "contact": "" // User ka phone number yahan daal sakte hain
         },
-        "theme": { "color": "#60367c" }
+        "theme": { "color": "#60377cff" }
     };
     var rzp1 = new Razorpay(options);
     document.getElementById('pay-btn').onclick = function(e){

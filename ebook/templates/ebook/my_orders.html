@@ -2,6 +2,16 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0" role="alert">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill me-2"></i>{% endif %}
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <div class="d-flex align-items-center mb-4">
         <div class="p-2 rounded-circle me-3" style="background-color: #60367c22;">
             <i class="bi bi-bag-check-fill fs-4" style="color: #60367cff;"></i>
@@ -27,9 +37,6 @@
                         <span class="text-dark small">#{{ order.order_id }}</span>
                     </div>
                     <div class="col-6 col-md-4 text-end">
-                        <a href="#" class="btn btn-sm btn-link text-decoration-none fw-bold p-0 me-3" style="color: #60367c; font-size: 13px;">
-                            <i class="bi bi-file-earmark-pdf me-1"></i>Invoice
-                        </a>
                         <a href="{% url 'track_order' order.order_id %}" class="btn btn-sm btn-outline-secondary px-3" style="font-size: 12px;">DETAILS</a>
                     </div>
                 </div>
@@ -39,19 +46,23 @@
                 <div class="row align-items-start">
                     <div class="col-md-7 border-end">
                         <div class="d-flex align-items-center mb-3">
-                            <span class="badge {% if order.status == 'Delivered' %}bg-success{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-info{% endif %} me-2">
-                                {{ order.status|default:"Processing" }}
+                            <span class="badge {% if order.status|lower == 'delivered' %}bg-success{% elif order.status|lower == 'cancelled' %}bg-danger{% else %}bg-info text-dark{% endif %} me-2">
+                                {{ order.status|upper|default:"PENDING" }}
                             </span>
-                            <small class="text-muted fw-bold">Expected delivery by 14 Feb, 2026</small>
+                            {% if order.status|lower != 'cancelled' and order.status|lower != 'delivered' %}
+                            <small class="text-muted fw-bold">Order processing...</small>
+                            {% endif %}
                         </div>
                         
-                        <div class="d-flex gap-3 mt-3 overflow-auto pb-2">
+                        <div class="d-flex gap-3 mt-3">
                             <div class="item-thumb border rounded p-1">
                                 <i class="bi bi-box-seam fs-2 text-muted px-2"></i>
                             </div>
                             <div class="item-info">
-                                <p class="mb-0 fw-bold small text-truncate" style="max-width: 250px;">Package contains {{ order.items.count|default:"1" }} items</p>
-                                <small class="text-muted">Payment: {{ order.payment_method }} | {% if order.is_paid %}<span class="text-success fw-bold">Paid</span>{% else %}<span class="text-danger">Pending</span>{% endif %}</small>
+                                <p class="mb-0 fw-bold small">Package contains {{ order.items.count }} items</p>
+                                <small class="text-muted">Payment: {{ order.payment_method }} | 
+                                    {% if order.is_paid %}<span class="text-success fw-bold">Paid</span>{% else %}<span class="text-danger">Pending</span>{% endif %}
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -59,17 +70,20 @@
                     <div class="col-md-5 ps-md-4 mt-3 mt-md-0">
                         <h6 class="small fw-bold text-uppercase text-muted mb-3">Manage Order</h6>
                         <div class="d-grid gap-2">
-                            <a href="{% url 'track_order' order.order_id %}" class="btn btn-warning btn-sm fw-bold py-2 shadow-sm">
-                                <i class="bi bi-geo-alt-fill me-1"></i> TRACK SHIPMENT
-                            </a>
-                            
-                            {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
-                            <button type="button" class="btn btn-white border btn-sm py-2 fw-bold text-danger" 
-                                    data-bs-toggle="modal" data-bs-target="#cancelModal{{ order.id }}">
-                                <i class="bi bi-x-circle me-1"></i> CANCEL ORDER
-                            </button>
+                            {% if order.status|lower != 'cancelled' %}
+                                <a href="{% url 'track_order' order.order_id %}" class="btn btn-warning btn-sm fw-bold py-2 shadow-sm text-white">
+                                    <i class="bi bi-geo-alt-fill me-1"></i> TRACK SHIPMENT
+                                </a>
+                                
+                                {% if order.status == 'Pending' or order.status == 'Packed' %}
+                                <button type="button" class="btn btn-white border btn-sm py-2 fw-bold text-danger" 
+                                        data-bs-toggle="modal" data-bs-target="#cancelModal{{ order.id }}">
+                                    <i class="bi bi-x-circle me-1"></i> CANCEL ORDER
+                                </button>
+                                {% endif %}
                             {% else %}
-                            <a href="/" class="btn btn-white border btn-sm py-2 fw-bold">REORDER ITEMS</a>
+                                <button class="btn btn-light btn-sm py-2 fw-bold disabled text-muted">ORDER CANCELLED</button>
+                                <a href="/" class="btn btn-outline-primary btn-sm py-2 fw-bold">CONTINUE SHOPPING</a>
                             {% endif %}
                         </div>
                     </div>
@@ -84,12 +98,12 @@
                         <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Confirm Cancellation</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body py-4">
-                        Aap Order <strong>#{{ order.order_id }}</strong> ko cancel kar rahe hain. Kya aap sure hain?
+                    <div class="modal-body py-4 text-center">
+                        <p class="mb-0">Aap Order <strong>#{{ order.order_id }}</strong> ko cancel kar rahe hain.<br>Kya aap sure hain?</p>
                     </div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">BACK</button>
-                        <a href="{% url 'cancel_order' order.order_id %}" class="btn btn-danger px-4 fw-bold">YES, CANCEL</a>
+                    <div class="modal-footer border-0 justify-content-center">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">KOI NAHI, BACK</button>
+                        <a href="{% url 'cancel_order' order.order_id %}" class="btn btn-danger px-4 fw-bold">HAAN, CANCEL KARO</a>
                     </div>
                 </div>
             </div>
@@ -97,11 +111,7 @@
         {% endfor %}
     {% else %}
         <div class="text-center py-5 bg-white shadow-sm border rounded">
-            <div class="mb-4">
-                <img src="https://img.icons8.com/clouds/200/000000/box.png" width="150" class="opacity-75">
-            </div>
             <h4 class="fw-bold">Koi Order nahi mila!</h4>
-            <p class="text-muted">Lagta hai aapne abhi tak hamari shop explore nahi ki hai.</p>
             <a href="/" class="btn text-white px-5 py-2 mt-2 rounded-1 fw-bold" style="background-color: #fb641b;">START SHOPPING</a>
         </div>
     {% endif %}
@@ -111,8 +121,8 @@
     .extra-small { font-size: 11px; letter-spacing: 0.5px; }
     .order-card { transition: 0.3s; border-left: 4px solid #60367cff !important; border-top: none !important; }
     .order-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.1) !important; }
-    .btn-warning { background-color: #ff9f00; border: none; color: #fff; }
-    .btn-warning:hover { background-color: #f39700; color: #fff; }
+    .btn-warning { background-color: #60367cff; border: none; color: #fff; }
+    .btn-warning:hover { background-color: #4d2b63; color: #fff; }
     .item-thumb { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; }
 </style>
 {% endblock %}

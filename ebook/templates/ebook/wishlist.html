@@ -8,12 +8,12 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb bg-transparent p-0">
                     <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Home</a></li>
-                    <li class="breadcrumb-item active fw-bold" style="color: #60367c;">My Wishlist</li>
+                    <li class="breadcrumb-item active fw-bold" style="color: #60377cff;">My Wishlist</li>
                 </ol>
             </nav>
             <div class="d-flex align-items-center mb-4">
-                <h3 class="fw-black mb-0">Saved Items</h3>
-                <span class="badge ms-3 rounded-pill px-3" style="background-color: #60367c15; color: #60367c;">
+                <h3 class="fw-bold mb-0" style="font-weight: 900;">Saved Items</h3>
+                <span class="badge ms-3 rounded-pill px-3" style="background-color: #60367c15; color: #60377cff;">
                     {{ wishlist_items.count }} Products
                 </span>
             </div>
@@ -24,6 +24,7 @@
         {% for item in wishlist_items %}
         <div class="col-6 col-md-4 col-lg-3">
             <div class="card h-100 border-0 shadow-sm product-card position-relative overflow-hidden" style="border-radius: 15px;">
+                
                 <a href="{% url 'toggle_wishlist' item.product.id %}" class="btn-remove-wishlist" title="Remove">
                     <i class="bi bi-trash3-fill"></i>
                 </a>
@@ -41,11 +42,11 @@
                 <div class="card-body text-center pt-0 px-2 pb-3">
                     <h6 class="text-truncate fw-bold mb-1 text-dark">{{ item.product.name }}</h6>
                     <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
-                        <span class="fw-black text-dark fs-5">₹{{ item.product.price }}</span>
+                        <span class="text-dark fs-5" style="font-weight: 900;">₹{{ item.product.price }}</span>
                     </div>
                     
                     <div class="d-grid">
-                        <a href="{% url 'add_to_cart' item.product.id %}" class="btn btn-dark btn-sm py-2 fw-bold rounded-pill">
+                        <a href="{% url 'add_to_cart' item.product.id %}" class="btn text-white btn-sm py-2 fw-bold rounded-pill" style="background-color: #60367c; border: none;">
                             <i class="bi bi-cart-plus me-1"></i> MOVE TO CART
                         </a>
                     </div>
@@ -54,12 +55,12 @@
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
-            <div class="empty-wishlist-icon mb-4">
+            <div class="mb-4">
                 <i class="bi bi-heartbreak text-muted opacity-25" style="font-size: 6rem;"></i>
             </div>
             <h2 class="fw-bold">Khali hai...</h2>
             <p class="text-muted mb-4">Aapki wishlist ko thoda pyaar chahiye. Kuch add kyu nahi karte?</p>
-            <a href="{% url 'product_list' %}" class="btn btn-lg text-white px-5 rounded-pill shadow" style="background-color: #60367c;">
+            <a href="/" class="btn btn-lg text-white px-5 rounded-pill shadow" style="background-color: #60377cff;">
                 Go Shopping
             </a>
         </div>
@@ -68,9 +69,6 @@
 </div>
 
 <style>
-    .fw-black { font-weight: 900; }
-    
-    /* Wishlist Card Styling */
     .wishlist-img-wrapper {
         height: 200px;
         display: flex;
@@ -80,21 +78,19 @@
     }
     .wishlist-img-wrapper img {
         max-height: 85%;
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: transform 0.4s ease;
     }
     .product-card:hover .wishlist-img-wrapper img {
         transform: scale(1.1);
     }
-
     .product-card {
         transition: 0.3s ease;
+        border: 1px solid #eee !important;
     }
     .product-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
     }
-
-    /* Floating Remove Button */
     .btn-remove-wishlist {
         position: absolute;
         top: 12px;
@@ -108,18 +104,15 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        text-decoration: none !important;
-        font-size: 14px;
-        transition: 0.3s;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-decoration: none;
     }
     .btn-remove-wishlist:hover {
         background: #ff4747;
         color: white;
-        transform: rotate(90deg);
     }
-
     @media (max-width: 576px) {
         .wishlist-img-wrapper { height: 160px; }
     }
 </style>
+{% endblock %}

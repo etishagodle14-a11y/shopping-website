@@ -15,10 +15,11 @@
             {% endif %}
             
             <div class="d-flex justify-content-center gap-3 mt-4">
-                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-lg flex-fill py-3 fw-bold text-white shadow-sm" style="background-color: #ff9f00; border-radius: 2px;">
+                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-lg flex-fill py-3 fw-bold text-white shadow-sm" style="background-color: #a86e10ff; border-radius: 2px;">
                     <i class="bi bi-cart-plus-fill me-2"></i> ADD TO CART
                 </a>
-                <a href="{% url 'checkout' %}" class="btn btn-lg flex-fill py-3 fw-bold text-white shadow-sm" style="background-color: #fb641b; border-radius: 2px;">
+                
+                <a href="{% url 'checkout_single' product.id %}" class="btn btn-lg flex-fill py-3 fw-bold text-white shadow-sm" style="background-color: #9c4316ff; border-radius: 2px;">
                     <i class="bi bi-lightning-fill me-1"></i> BUY NOW
                 </a>
             </div>
@@ -85,7 +86,7 @@
 </div>
 
 <style>
-    .main-product-img { max-height: 400px; transition: transform .3s; }
+    .main-product-img { max-height: 400px; transition: transform .3s; object-fit: contain; }
     .main-product-img:hover { transform: scale(1.05); }
     .cursor-pointer { cursor: pointer; }
     .breadcrumb-item + .breadcrumb-item::before { content: ">"; }

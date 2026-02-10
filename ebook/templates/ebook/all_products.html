@@ -1,79 +1,100 @@
 {% extends 'ebook/base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold m-0">All Products</h4>
-        <small class="text-muted">{{ products.count }} Items found</small>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <form action="{% url 'all_products' %}" method="GET" class="d-flex shadow-sm">
+                <input type="text" name="q" class="form-control border-0 py-2 ps-4" 
+                       placeholder="Search for products, brands and more..." 
+                       value="{{ query|default:'' }}" 
+                       style="border-radius: 4px 0 0 4px;">
+                <button type="submit" class="btn btn-primary px-4" 
+                        style="background-color: #2874f0; border: none; border-radius: 0 4px 4px 0;">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
     </div>
 
-    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
-        {% for product in products %}
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm position-relative product-card-hover">
-                
-                <a href="{% url 'toggle_wishlist' product.id %}" class="position-absolute top-0 end-0 m-2 text-decoration-none" style="z-index: 5;">
-                    <i class="bi bi-heart-fill {% if product.id in wishlist_ids %}text-danger{% else %}text-muted{% endif %}" style="font-size: 1rem; filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));"></i>
-                </a>
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
+                <div>
+                    <h5 class="fw-bold mb-0">
+                        {% if query %} Search Results for "{{ query }}" {% else %} Top Deals For You {% endif %}
+                    </h5>
+                    <small class="text-muted">Showing {{ products|length }} items</small>
+                </div>
+                <div class="d-none d-md-block">
+                    <span class="badge bg-light text-dark border p-2">Sort by: Newest</span>
+                </div>
+            </div>
 
-                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark d-block h-100">
-                    <div style="height: 180px; display: flex; align-items: center; justify-content: center; background: #fff; padding: 10px;">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="{{ product.name }}">
-                        {% else %}
-                            <img src="https://via.placeholder.com/200" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                        {% endif %}
-                    </div>
-                    
-                    <div class="card-body p-2 border-top">
-                        <div class="product-name-style mb-1">
-                            {{ product.name }}
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm product-card" style="border-radius: 8px; border: 1px solid #f0f0f0 !important;">
+                        
+                        <div class="p-3 bg-white d-flex align-items-center justify-content-center" style="height: 220px; position: relative;">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="img-fluid h-100 w-100" style="object-fit: contain;">
+                            {% else %}
+                                <img src="https://via.placeholder.com/200" class="img-fluid h-100 w-100" style="object-fit: contain;">
+                            {% endif %}
+                            
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="text-decoration-none">
+                                    <i class="bi bi-heart text-muted fs-5"></i>
+                                </a>
+                            </div>
                         </div>
                         
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-dark fw-bold">₹{{ product.price }}</span>
-                            {% if product.old_price %}
-                            <small class="text-muted text-decoration-line-through" style="font-size: 11px;">₹{{ product.old_price }}</small>
-                            {% endif %}
+                        <div class="card-body d-flex flex-column pt-0 bg-white">
+                            <h6 class="text-truncate fw-bold mb-1" title="{{ product.name }}" style="font-size: 14px;">
+                                {{ product.name }}
+                            </h6>
+                            <p class="small text-muted mb-2" style="font-size: 12px;">Free Delivery</p>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span class="fw-bold fs-5">₹{{ product.price }}</span>
+                                    {% if product.old_price %}
+                                    <del class="text-muted small">₹{{ product.old_price }}</del>
+                                    <span class="text-success small fw-bold">{{ product.get_discount }}% off</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary w-100 fw-bold border-0 py-2" style="background-color: #fb641b; border-radius: 2px; font-size: 13px;">
+                                    <i class="bi bi-cart-plus me-1"></i> ADD TO CART
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search fs-1 text-muted"></i>
+                    <h4 class="mt-3">Afsos! "{{ query }}" ke liye kuch nahi mila.</h4>
+                    <p class="text-muted">Kripya spelling check karein ya kuch aur search karein.</p>
+                    <a href="{% url 'all_products' %}" class="btn btn-primary mt-2">See All Products</a>
+                </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
     </div>
 </div>
 
 <style>
-    /* कंसिस्टेंट डिज़ाइन के लिए ज़रूरी CSS */
-    .product-name-style {
-        font-size: 13px;
-        font-weight: 500;
-        color: #212121;
-        line-height: 1.4;
-        height: 38px; /* Fixed height for 2 lines */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    .product-card { transition: all 0.3s ease; }
+    .product-card:hover { 
+        transform: translateY(-8px); 
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12) !important; 
     }
-    
-    .product-card-hover {
-        transition: transform 0.2s, box-shadow 0.2s;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    .product-card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
-    }
-
-    @media (max-width: 768px) {
-        .product-name-style {
-            font-size: 12px;
-            height: 34px;
-        }
+    .form-control:focus {
+        box-shadow: none;
+        border: 1px solid #2874f0;
     }
 </style>
 {% endblock %}

@@ -21,15 +21,15 @@
                                     </div>
                                     
                                     <div class="d-flex align-items-center justify-content-center mt-2">
-                                        <button class="btn btn-sm btn-outline-secondary rounded-circle update-cart" 
-                                                data-product="{{ item.product.id }}" data-action="remove"
-                                                style="width: 28px; height: 28px; line-height: 10px;">-</button>
-                                        
-                                        <span id="qty-{{ item.product.id }}" class="fw-bold mx-3">{{ item.quantity }}</span>
-                                        
-                                        <button class="btn btn-sm btn-outline-secondary rounded-circle update-cart" 
-                                                data-product="{{ item.product.id }}" data-action="add"
-                                                style="width: 28px; height: 28px; line-height: 10px;">+</button>
+                                        <a href="{% url 'decrease_quantity' item.id %}" class="btn btn-sm btn-light border rounded-circle" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: black;">
+                                            <i class="bi bi-dash"></i>
+                                        </a>
+
+                                        <span class="mx-3 fw-bold" style="font-size: 14px;">{{ item.quantity }}</span>
+
+                                        <a href="{% url 'increase_quantity' item.id %}" class="btn btn-sm btn-light border rounded-circle" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: black;">
+                                            <i class="bi bi-plus"></i>
+                                        </a>
                                     </div>
                                 </div>
                                 
@@ -47,9 +47,15 @@
                                         {% endif %}
                                     </div>
                                     
-                                    <div class="mt-3 d-flex flex-wrap gap-3">
+                                    <div class="mt-3 d-flex flex-wrap align-items-center gap-3">
                                         <a href="{% url 'toggle_wishlist' item.product.id %}" class="text-dark text-decoration-none fw-bold small action-link">SAVE FOR LATER</a>
-                                        <a href="{% url 'remove_from_cart' item.id %}" class="text-dark text-decoration-none fw-bold small action-link text-danger">REMOVE</a>
+                                        
+                                        <a href="{% url 'remove_from_cart' item.id %}" class="text-danger text-decoration-none fw-bold small action-link">REMOVE</a>
+                                        
+                                        <a href="{% url 'checkout_single' item.product.id %}" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm" 
+                                           style="background-color: #60377cff; border: none; border-radius: 2px; font-size: 12px;">
+                                            BUY THIS ONLY
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -84,10 +90,6 @@
                         <span>Price ({{ cart_items.count }} items)</span>
                         <span>₹{{ total }}</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Discount</span>
-                        <span class="text-success">- ₹{{ total_discount|default:"0" }}</span>
-                    </div>
                     <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
                         <span>Delivery Charges</span>
                         <span class="text-success">FREE</span>
@@ -97,7 +99,7 @@
                         <span>Total Amount</span>
                         <span id="grand-total-side">₹{{ grand_total }}</span>
                     </div>
-                    <p class="text-success fw-bold small mb-0">You will save ₹{{ total_discount|default:"0" }} on this order</p>
+                    <p class="text-success fw-bold small mb-0">Safe and Secure Payments. Easy returns.</p>
                 </div>
             </div>
         </div>
@@ -108,31 +110,13 @@
     .text-truncate-2 {
         display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .action-link:hover { color: #2874f0 !important; }
+    .action-link { font-size: 14px; transition: color 0.2s; cursor: pointer; }
+    .action-link:hover { color: #60377cff !important; }
+    .text-danger:hover { color: #dc3545 !important; } /* Highlight for Remove */
     .sticky-bottom { position: sticky; bottom: 0; z-index: 100; }
+    
     @media (max-width: 768px) {
-        .sticky-bottom { bottom: 55px; } /* Above mobile nav */
+        .sticky-bottom { bottom: 0; } 
     }
 </style>
-
-<script>
-    // JS Logic for quantity (Smooth Experience)
-    document.querySelectorAll('.update-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            let productId = this.dataset.product;
-            let action = this.dataset.action;
-
-            fetch("/update_item/", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-                body: JSON.stringify({ 'productId': productId, 'action': action })
-            })
-            .then(res => res.json())
-            .then(data => {
-                // Instantly refresh without jump
-                location.reload(); 
-            });
-        });
-    });
-</script>
 {% endblock %}

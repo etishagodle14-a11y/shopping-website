@@ -66,6 +66,7 @@ TEMPLATES = [
                 
                 # Yeh line aapko add karni hai:
                 'ebook.context_processors.cart_count', 
+                'ebook.context_processors.category_renderer',
             ],
         }
     }
@@ -123,10 +124,13 @@ import os
 
 # Static configuration
 STATIC_URL = 'static/'
+
+# Ye line check karegi ki folder hai ya nahi, tabhi add karegi
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Ye line extra add karein
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')# Ye line extra add karein
 
 # Media configuration
 MEDIA_URL = '/media/'

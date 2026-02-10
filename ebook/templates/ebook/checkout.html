@@ -1,162 +1,259 @@
 {% extends 'ebook/base.html' %}
-{% load static %}
-
 {% block content %}
-<div class="container my-4 my-md-5">
-    <form action="{% url 'place_order' %}" method="POST" id="mainOrderForm">
-        {% csrf_token %}
-        
-        <div class="row g-4">
-            <div class="col-lg-8">
-                
-                <div class="card shadow-sm mb-4 border-0">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="fw-bold mb-0" style="color: #60367cff;"><i class="bi bi-geo-alt me-2"></i>1. DELIVERY ADDRESS</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">Full Name</label>
-                                <input type="text" name="full_name" class="form-control bg-light border-0 py-2" placeholder="e.g. Rahul Sharma" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">Phone Number</label>
-                                <input type="tel" name="phone" pattern="[0-9]{10}" class="form-control bg-light border-0 py-2" placeholder="10-digit mobile number" required>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold text-muted">Full Address</label>
-                                <textarea name="address" class="form-control bg-light border-0" rows="2" placeholder="House No., Building, Street, Area" required></textarea>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted">Pincode</label>
-                                <input type="text" name="pincode" pattern="[0-9]{6}" class="form-control bg-light border-0" placeholder="6-digit PIN" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted">City</label>
-                                <input type="text" name="city" class="form-control bg-light border-0" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted">State</label>
-                                <select name="state" class="form-select bg-light border-0" required>
-                                    <option value="" selected disabled>Choose...</option>
-                                    <option>Andhra Pradesh</option><option>Bihar</option><option>Delhi</option>
-                                    <option>Gujarat</option><option>Haryana</option><option>Karnataka</option>
-                                    <option>Madhya Pradesh</option><option>Maharashtra</option><option>Punjab</option>
-                                    <option>Rajasthan</option><option>Uttar Pradesh</option><option>West Bengal</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="fw-bold mb-0" style="color: #60367cff;"><i class="bi bi-credit-card me-2"></i>2. PAYMENT OPTIONS</h6>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="p-3 border-bottom">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="payment_method" id="upi" value="UPI" checked>
-                                <label class="form-check-label fw-bold" for="upi">UPI (GPay, PhonePe, Paytm)</label>
+<style>
+    /* Payment Card Styling */
+    .payment-card {
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        text-align: center;
+        background: #fff;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 90px;
+    }
+    .payment-card:hover {
+        border-color: #2874f0;
+        transform: translateY(-2px);
+    }
+    .payment-card img { height: 25px; margin-bottom: 8px; object-fit: contain; }
+    .payment-card i { font-size: 24px; margin-bottom: 5px; color: #555; }
+    .payment-radio-hidden { display: none; }
+    
+    input[type="radio"]:checked + .payment-card {
+        border: 2px solid #2874f0;
+        background: #f0f5ff;
+    }
+    input[type="radio"]:checked + .payment-card i { color: #2874f0; }
+
+    .btn-orange { background-color: #fb641b; color: white; font-weight: bold; border: none; }
+    .btn-orange:hover { background-color: #f45101; color: white; }
+    
+    .sticky-summary { position: sticky; top: 20px; }
+</style>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white"><h4 class="mb-0">Shipping Address</h4></div>
+                <div class="card-body">
+                    <form action="{% url 'place_order' %}" method="POST" id="checkout-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="single_product_id" value="{{ single_product_id }}">
+                        <input type="hidden" name="transaction_id" id="transaction_id_input">
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="full_name" class="form-control" required placeholder="Aapka Pura Naam">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone" class="form-control" required placeholder="10 Digit Number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Pincode</label>
+                                <input type="text" name="pincode" class="form-control" required placeholder="6 Digit Pincode">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Address</label>
+                                <textarea name="address" class="form-control" rows="3" required placeholder="House No, Colony, Landmark..."></textarea>
                             </div>
                             
-                            <div class="upi-container" id="upiSection">
-                                <div class="icon-grid mt-3">
-                                    <div class="pay-icon" onclick="handlePayment('GPay')">
-                                        <img src="https://img.icons8.com/color/48/google-pay-india.png" alt="GPay">
-                                        <span>G-Pay</span>
-                                    </div>
-                                    <div class="pay-icon" onclick="handlePayment('PhonePe')">
-                                        <img src="https://img.icons8.com/color/48/phonepe.png" alt="PhonePe">
-                                        <span>PhonePe</span>
-                                    </div>
-                                    <div class="pay-icon" onclick="handlePayment('Paytm')">
-                                        <img src="https://img.icons8.com/color/48/paytm.png" alt="Paytm">
-                                        <span>Paytm</span>
-                                    </div>
-                                    <div class="pay-icon" onclick="handlePayment('Amazon')">
-                                        <img src="https://img.icons8.com/color/48/amazon-pay.png" alt="Amazon">
-                                        <span>Amazon</span>
-                                    </div>
-                                </div>
-                                <div class="text-center mt-3 p-3 rounded" style="background: #f8f9fa; border: 1px dashed #ccc;">
-                                    <p class="small text-muted mb-2">OR Scan QR Code</p>
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=krishugodle@oksbi&pn=ApnaMart&am={{ grand_total }}&cu=INR" width="120">
-                                </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City</label>
+                                <input type="text" name="city" class="form-control" required placeholder="Shahar">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="state" class="form-label">State</label>
+                                <select class="form-select" id="state" name="state" required>
+                                    <option value="" selected disabled>Rajya Chunein...</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Bihar">Bihar</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    </select>
                             </div>
                         </div>
 
-                        <div class="p-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD">
-                                <label class="form-check-label fw-bold" for="cod">Cash on Delivery (COD)</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <hr class="my-4">
 
-            <div class="col-lg-4">
-                <div class="sticky-top" style="top: 80px;">
-                    <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-header bg-white py-3">
-                            <h6 class="fw-bold mb-0 text-muted">PRICE DETAILS</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Price ({{ cart_items|length }} items)</span>
-                                <span>₹{{ total }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 text-success">
-                                <span>Discount</span>
-                                <span class="fw-bold">- ₹{{ discount|default:"0" }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Delivery</span>
-                                <span class="text-success fw-bold">FREE</span>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between mb-3">
-                                <h5 class="fw-bold">Total Payable</h5>
-                                <h5 class="fw-bold" style="color: #60367cff;">₹{{ grand_total }}</h5>
+                        <h4 class="mb-4">Select Payment Method</h4>
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <label class="w-100">
+                                    <input type="radio" name="payment_method" value="COD" class="payment-radio-hidden" checked onclick="togglePaymentUI('COD')">
+                                    <div class="payment-card">
+                                        <i class="bi bi-cash-stack"></i>
+                                        <div class="small fw-bold">COD</div>
+                                    </div>
+                                </label>
                             </div>
 
-                            <button type="submit" class="btn btn-warning w-100 fw-bold py-3 shadow-sm" style="background-color: #fb641b; color: white; border: none; border-radius: 4px;">
-                                CONFIRM ORDER
-                            </button>
-                        </div>
-                    </div>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100">
+                                    <input type="radio" name="payment_method" value="UPI" class="payment-radio-hidden" onclick="togglePaymentUI('UPI')">
+                                    <div class="payment-card">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/1200px-Google_Pay_Logo.svg.png" alt="GPay">
+                                        <div class="small fw-bold">G-Pay</div>
+                                    </div>
+                                </label>
+                            </div>
 
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <label class="small fw-bold text-muted mb-2">HAVE A GIFT CARD?</label>
-                            <div class="input-group">
-                                <input type="text" name="gift_card_code" class="form-control form-control-sm" placeholder="Enter Code">
-                                <button class="btn btn-dark btn-sm" type="submit" formaction="{% url 'apply_gift_card' %}">APPLY</button>
+                            <div class="col-6 col-md-3">
+                                <label class="w-100">
+                                    <input type="radio" name="payment_method" value="UPI" class="payment-radio-hidden" onclick="togglePaymentUI('UPI')">
+                                    <div class="payment-card">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/1280px-PhonePe_Logo.svg.png" alt="PhonePe">
+                                        <div class="small fw-bold">PhonePe</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <label class="w-100">
+                                    <input type="radio" name="payment_method" value="UPI" class="payment-radio-hidden" onclick="togglePaymentUI('UPI')">
+                                    <div class="payment-card">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/1200px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm">
+                                        <div class="small fw-bold">Paytm</div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
+
+                        <button type="submit" id="main-submit-btn" class="btn btn-orange w-100 btn-lg shadow">CONFIRM ORDER (COD)</button>
+                        
+                        <button type="button" id="upi-pay-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success w-100 btn-lg shadow">
+                            PAY & PLACE ORDER ₹{{ grand_total }}
+                        </button>
+                    </form>
+
+                    <div id="upi-confirm-section" style="display:none;" class="alert alert-info mt-4 text-center border-0 shadow-sm">
+                        <p class="mb-2 text-dark fw-bold">Aapne UPI App se payment kar di?</p>
+                        <button type="button" onclick="finalizeOrder()" class="btn btn-dark w-100">Yes, I Have Paid - Place Order</button>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm sticky-summary">
+                <div class="card-header bg-white"><h4 class="mb-0">Order Summary</h4></div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" style="width: 50px; height: 50px; object-fit: contain;" class="me-3 border rounded p-1">
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0 small fw-bold">{{ item.product.name }}</h6>
+                                <small class="text-muted">Qty: {{ item.quantity }}</small>
+                            </div>
+                        </div>
+                        <span class="fw-bold small">₹{{ item.total_price_val }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2 small"><span>Price Total</span><span>₹{{ total }}</span></div>
+                    <div class="d-flex justify-content-between mb-2 small"><span>Delivery</span><span class="text-success">{% if delivery_charge > 0 %}₹{{ delivery_charge }}{% else %}FREE{% endif %}</span></div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-0">
+                        <h5 class="fw-bold">Total</h5>
+                        <h5 class="fw-bold text-primary">₹{{ grand_total }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-{% include 'ebook/includes/qr_modal.html' %} 
+<div id="qrModal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Scan & Pay</h5>
+                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="text-primary mb-3">₹{{ grand_total }}</h2>
+                <div class="p-3 border rounded bg-white d-inline-block shadow-sm">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=krishugodle@oksbi%26pn=ApnaMart%26am={{ grand_total }}%26cu=INR%26tn=OrderPayment" alt="QR Code">
+                </div>
+                <p class="mt-3 text-muted">Kisi bhi UPI App se scan karke pay karein.</p>
+                <button type="button" onclick="finalizeOrder()" class="btn btn-success w-100 btn-lg mt-2">I Have Paid - Confirm Order</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<style>
-    .pay-icon {
-        border: 1.5px solid #eee;
-        border-radius: 10px;
-        padding: 12px 5px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        background: #fff;
+<script>
+// UI Control: Toggle between COD and UPI buttons
+function togglePaymentUI(method) {
+    const mainBtn = document.getElementById('main-submit-btn');
+    const upiBtn = document.getElementById('upi-pay-btn');
+    const confirmSection = document.getElementById('upi-confirm-section');
+
+    if (method === 'UPI') {
+        mainBtn.style.display = 'none';
+        upiBtn.style.display = 'block';
+    } else {
+        mainBtn.style.display = 'block';
+        upiBtn.style.display = 'none';
+        confirmSection.style.display = 'none';
     }
-    .pay-icon:hover { border-color: #60367c; background: #fdf7ff; transform: translateY(-2px); }
-    .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .pay-icon img { width: 32px; height: 32px; margin-bottom: 5px; }
-    .pay-icon span { font-size: 10px; font-weight: 700; display: block; }
-</style>
+}
+
+// Payment Handler: Handles both Mobile Redirect and Desktop QR
+function handlePayment() {
+    const amount = "{{ grand_total }}";
+    const upiId = "krishugodle@oksbi";
+    const name = "Apna Mart";
+    
+    // Dynamic UPI URL with exact amount
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Order Payment')}`;
+
+    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        // Mobile: Redirect to UPI App
+        window.location.href = upiUrl;
+        document.getElementById('upi-confirm-section').style.display = 'block';
+    } else {
+        // Desktop: Show QR Modal
+        var myModal = new bootstrap.Modal(document.getElementById('qrModal'));
+        myModal.show();
+    }
+}
+
+function closeModal() {
+    var myModalEl = document.getElementById('qrModal');
+    var modal = bootstrap.Modal.getInstance(myModalEl);
+    if (modal) modal.hide();
+}
+
+// Final Order Submission
+function finalizeOrder() {
+    // Generate a temporary transaction ID
+    document.getElementById('transaction_id_input').value = "UPI_" + Date.now();
+    
+    const upiBtn = document.getElementById('upi-pay-btn');
+    upiBtn.innerHTML = "Processing...";
+    upiBtn.disabled = true;
+    
+    // Submit the form to place_order view
+    document.getElementById('checkout-form').submit();
+}
+</script>
+
 {% endblock %}

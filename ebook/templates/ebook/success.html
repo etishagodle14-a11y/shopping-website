@@ -104,7 +104,7 @@
     /* Order Stepper Styling */
     .step-icon {
         width: 40px; height: 40px;
-        background: #60367c;
+        background: #60377cff;
         color: white;
         border-radius: 50%;
         display: flex;
@@ -121,7 +121,7 @@
         height: 2px; background: #e0e0e0;
         z-index: 1;
     }
-    .step.active .step-icon { background: #28a745; box-shadow: 0 0 15px rgba(40,167,69,0.3); }
+    .step.active .step-icon { background: #922072ff; box-shadow: 0 0 15px rgba(167, 40, 148, 0.3); }
 
     .upi-box { background-color: #f8fbff; border: 1px solid #e1f0ff; }
     .qr-zoom { transition: 0.3s; }
@@ -146,14 +146,14 @@
                 angle: 60,
                 spread: 55,
                 origin: { x: 0 },
-                colors: ['#60367c', '#ffffff']
+                colors: ['#60377cff', '#ffffff']
             });
             confetti({
                 particleCount: 3,
                 angle: 120,
                 spread: 55,
                 origin: { x: 1 },
-                colors: ['#60367c', '#ffffff']
+                colors: ['#60377cff', '#ffffff']
             });
 
             if (Date.now() < end) {

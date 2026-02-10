@@ -12,52 +12,59 @@
             <p class="mb-0 opacity-90 fw-bold text-uppercase tracking-wider">Sabse sasti deals, sirf aaj ke liye!</p>
         </div>
         <div class="text-end d-none d-md-block bg-white bg-opacity-10 p-3 rounded-3 border border-white border-opacity-25">
-            <div id="offer-timer" class="fw-bold fs-3 font-monospace">00h 00m 00s</div>
-            <div class="small fw-bold text-uppercase" style="color: #ffd700;">🔥 Ends In</div>
+            <div id="offer-timer" class="fw-bold fs-3 font-monospace">23h 59m 59s</div>
+            <div class="small fw-bold text-uppercase" style="color: #ab8524ff;">🔥 Ends In</div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
         <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-stars text-warning"></i> DEAL OF THE DAY</h5>
-            <span class="badge bg-danger rounded-pill px-3">{{ products.count }} Items Left</span>
+            <h5 class="mb-0 fw-bold text-uppercase"><i class="bi bi-stars text-warning"></i> Deal of the Day</h5>
+            <span class="badge bg-danger rounded-pill px-3">{{ products.count }} Items Found</span>
         </div>
         
         <div class="card-body p-3 bg-light">
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
                 {% for product in products %}
                 <div class="col">
-                    <div class="product-card border-0 h-100 p-0 text-center position-relative shadow-sm bg-white rounded-3">
-                        <div class="sale-label">UP TO 50% OFF</div>
+                    <div class="product-card border-0 h-100 p-0 text-center position-relative shadow-sm bg-white rounded-3 overflow-hidden">
                         
-                        <a href="{% url 'toggle_wishlist' product.id %}" class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
-                            <i class="bi bi-heart-fill {% if product.id in wishlist_ids %}text-danger{% else %}text-muted opacity-25{% endif %} fs-5"></i>
-                        </a>
-
+                        {% if product.old_price %}
+                        <div class="sale-label">UP TO 50% OFF</div>
+                        {% endif %}
+                        
                         <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
                             <div class="img-wrapper p-3">
+                                {% if product.image %}
                                 <img src="{{ product.image.url }}" class="product-img zoom-effect" alt="{{ product.name }}">
+                                {% endif %}
                             </div>
+                            
                             <div class="p-3">
-                                <div class="fw-bold small text-truncate text-muted mb-1">{{ product.brand.name|default:"Apna Mart" }}</div>
                                 <div class="fw-bold mb-2 text-dark product-title">{{ product.name }}</div>
                                 
                                 <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
-                                    <span class="fs-5 fw-black text-dark">₹{{ product.price }}</span>
-                                    <span class="text-muted text-decoration-line-through small">₹{{ product.old_price|default:product.price|add:499 }}</span>
+                                    <span class="fs-5 fw-bold text-dark">₹{{ product.price }}</span>
+                                    {% if product.old_price %}
+                                    <span class="text-muted text-decoration-line-through small">₹{{ product.old_price }}</span>
+                                    {% endif %}
                                 </div>
 
-                                <div class="progress mb-2" style="height: 6px;">
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress mb-2" style="height: 6px; border-radius: 10px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 85%;"></div>
                                 </div>
-                                <div class="extra-small text-danger fw-bold mb-3">85% Sold out! Hurry</div>
+                                <div class="extra-small text-danger fw-bold mb-3">85% SOLD OUT! HURRY</div>
 
-                                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark w-100 fw-bold rounded-2 py-2">
-                                    <i class="bi bi-cart-plus me-1"></i> ADD TO CART
+                                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-warning w-100 fw-bold rounded-2">
+                                    <i class="bi bi-cart-plus"></i> ADD TO CART
                                 </a>
                             </div>
                         </a>
                     </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5 bg-white">
+                    <h5 class="text-muted">Abhi koi offers nahi hain.</h5>
                 </div>
                 {% endfor %}
             </div>
@@ -66,41 +73,32 @@
 </div>
 
 <style>
-    /* Flash Sale Animations */
-    @keyframes flicker {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-    .animate-flicker { animation: flicker 1s infinite; color: #ffd700; }
-    
-    .fw-black { font-weight: 900; }
-    .tracking-wider { letter-spacing: 2px; }
-
-    .product-card { transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
-
-    .sale-label {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: #fb641b;
-        color: white;
-        font-size: 9px;
-        font-weight: 900;
-        padding: 3px 8px;
-        border-radius: 3px;
-        z-index: 5;
-    }
-
-    .product-title {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
+    @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .animate-flicker { animation: flicker 1s infinite; }
+    .product-card { transition: 0.3s; border: 1px solid #f0f0f0; }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+    .sale-label { position: absolute; top: 10px; left: 10px; background: #ab8524ff; color: white; font-size: 10px; padding: 2px 8px; border-radius: 3px; z-index: 5; font-weight: bold; }
+    .img-wrapper { height: 180px; display: flex; align-items: center; justify-content: center; }
+    .product-img { max-height: 100%; max-width: 100%; object-fit: contain; }
+    .product-title { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
     .extra-small { font-size: 10px; }
-    
-    .img-wrapper { height: 160px; display: flex; align-items: center; justify-content: center; background: #fff; }
-    .product-img { max-height: 100%; object-fit: contain; }
 </style>
+
+<script>
+    function startTimer(duration, display) {
+        var timer = duration, hours, minutes, seconds;
+        setInterval(function () {
+            hours = parseInt(timer / 3600, 10);
+            minutes = parseInt((timer % 3600) / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+            display.textContent = (hours < 10 ? "0" + hours : hours) + "h " + 
+                                  (minutes < 10 ? "0" + minutes : minutes) + "m " + 
+                                  (seconds < 10 ? "0" + seconds : seconds) + "s";
+            if (--timer < 0) timer = duration;
+        }, 1000);
+    }
+    window.onload = function () {
+        startTimer(24 * 60 * 60, document.querySelector('#offer-timer'));
+    };
+</script>
+{% endblock %}
