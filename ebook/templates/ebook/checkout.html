@@ -3,62 +3,84 @@
 
 <style>
     body { background-color: #f1f3f6; }
-    .card { border: none; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .card { border: none; border-radius: 4px; margin-bottom: 10px; box-shadow: 0 1px 2px 0 rgba(0,0,0,.1); }
+    .price-header { border-bottom: 1px solid #f0f0f0; padding: 15px 24px; font-weight: bold; color: #878787; font-size: 16px; }
     
+    /* Product Item Styling */
+    .checkout-product-item { display: flex; padding: 20px; gap: 20px; border-bottom: 1px solid #f0f0f0; background: #fff; }
+    .product-img { width: 70px; height: 70px; object-fit: contain; }
+    .product-info h6 { font-size: 15px; margin-bottom: 5px; font-weight: 500; }
+
     /* Payment Selection */
-    .payment-card {
-        border: 1px solid #ddd; border-radius: 10px; padding: 12px;
-        cursor: pointer; text-align: center; background: #fff; transition: 0.2s;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 85px;
+    .payment-card { 
+        border: 1px solid #ddd; border-radius: 8px; padding: 12px; cursor: pointer; 
+        text-align: center; background: #fff; display: flex; flex-direction: column; 
+        align-items: center; justify-content: center; min-height: 85px; transition: 0.2s;
     }
     .payment-radio-hidden { display: none; }
-    input[type="radio"]:checked + .payment-card {
-        border: 2px solid #51295a; background: #fdf7ff;
-    }
-    .payment-card img { height: 22px; margin-bottom: 8px; object-fit: contain; }
+    input[type="radio"]:checked + .payment-card { border: 2px solid #51295a; background: #fdf7ff; }
+    .payment-card img { height: 22px; margin-bottom: 8px; }
 
-    /* Price Details Styling */
-    .price-header { border-bottom: 1px solid #f0f0f0; padding: 12px 15px; font-weight: bold; color: #878787; }
-    .price-item { display: flex; justify-content: space-between; padding: 8px 15px; font-size: 15px; }
-    .total-amount { border-top: 1px dashed #e0e0e0; margin-top: 10px; padding: 15px; display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; }
+    .btn-orange { background-color: #fb641b; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 3px; }
 
     @media (max-width: 768px) {
-        .mobile-order-bar {
-            position: fixed; bottom: 56px; left: 0; right: 0; 
-            background: white; padding: 10px 15px; z-index: 2500;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        .mobile-order-bar { 
+            position: fixed; bottom: 56px; left: 0; right: 0; background: white; 
+            padding: 10px 15px; z-index: 2500; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
         }
         .main-container { padding-bottom: 150px !important; }
     }
-    @media (min-width: 769px) {
-        .sticky-summary { position: sticky; top: 85px; }
-    }
-    .btn-orange { background-color: #fb641b; color: white; font-weight: bold; border: none; padding: 12px 25px; border-radius: 3px; }
 </style>
 
 <div class="container py-3 main-container">
     <div class="row">
-        <div class="col-md-7 col-lg-8">
+        <div class="col-md-8">
             <form action="{% url 'place_order' %}" method="POST" id="checkout-form">
                 {% csrf_token %}
                 <input type="hidden" name="single_product_id" value="{{ single_product_id }}">
                 <input type="hidden" name="transaction_id" id="transaction_id_input">
-                
+
                 <div class="card">
                     <div class="price-header text-uppercase">1. Delivery Address</div>
                     <div class="card-body">
                         <div class="row g-2">
-                            <div class="col-12"><input type="text" name="full_name" class="form-control" placeholder="Full Name" required></div>
-                            <div class="col-6"><input type="text" name="phone" class="form-control" placeholder="Mobile Number" required></div>
-                            <div class="col-6"><input type="text" name="pincode" class="form-control" placeholder="Pincode" required></div>
-                            <div class="col-12"><textarea name="address" class="form-control" placeholder="Full Address" rows="2" required></textarea></div>
+                            <div class="col-md-6"><input type="text" name="full_name" class="form-control" placeholder="Full Name" required></div>
+                            <div class="col-md-6"><input type="text" name="phone" class="form-control" placeholder="10-digit mobile number" required></div>
+                            <div class="col-12"><textarea name="address" class="form-control" placeholder="Address (Area and Street)" rows="2" required></textarea></div>
+                            <div class="col-md-6"><input type="text" name="pincode" class="form-control" placeholder="Pincode" required></div>
+                            <div class="col-md-6"><input type="text" name="city" class="form-control" placeholder="City/Town" required></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="price-header text-uppercase">2. Payment Options</div>
+                    <div class="price-header text-uppercase">2. Order Summary</div>
+                    {% for item in cart_items %}
+                    <div class="checkout-product-item">
+                        <img src="{{ item.product.image.url }}" class="product-img">
+                        <div class="product-info">
+                            <h6>{{ item.product.name }}</h6>
+                            <p class="text-muted small mb-1">Seller: Apna Mart</p>
+                            <h5 class="fw-bold">₹{{ item.product.price }}</h5>
+                        </div>
+                    </div>
+                    {% empty %}
+                        {% if single_product %}
+                        <div class="checkout-product-item">
+                            <img src="{{ single_product.image.url }}" class="product-img">
+                            <div class="product-info">
+                                <h6>{{ single_product.name }}</h6>
+                                <p class="text-muted small mb-1">Seller: Apna Mart</p>
+                                <h5 class="fw-bold">₹{{ single_product.price }}</h5>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="card">
+                    <div class="price-header text-uppercase">3. Payment Options</div>
                     <div class="card-body">
                         <div class="row g-2">
                             <div class="col-6 col-md-3">
@@ -72,7 +94,7 @@
                                     <input type="radio" name="payment_method" value="UPI" class="payment-radio-hidden" onclick="togglePaymentUI('UPI')">
                                     <div class="payment-card">
                                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/1200px-Google_Pay_Logo.svg.png">
-                                        <div class="small fw-bold">UPI</div>
+                                        <div class="small fw-bold">UPI / QR</div>
                                     </div>
                                 </label>
                             </div>
@@ -80,40 +102,41 @@
                     </div>
                 </div>
 
-                <button type="submit" id="desktop-submit-btn" class="btn btn-orange w-100 d-none d-md-block shadow mb-4">PLACE ORDER</button>
-                <button type="button" id="desktop-upi-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success w-100 d-none d-md-block shadow mb-4">PAY NOW (UPI)</button>
+                <button type="submit" id="desk-submit-btn" class="btn btn-orange w-100 d-none d-md-block shadow mb-4">PLACE ORDER</button>
+                <button type="button" id="desk-upi-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success w-100 d-none d-md-block shadow mb-4 py-3 fw-bold">PAY NOW (UPI)</button>
 
                 <div class="mobile-order-bar d-md-none">
                     <div>
                         <h5 class="mb-0 fw-bold">₹{{ grand_total|default:total }}</h5>
-                        <small class="text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#price-summary-box">View Summary</small>
+                        <small class="text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#price-summary-box">Details</small>
                     </div>
-                    <button type="submit" id="mob-submit-btn" class="btn btn-orange">PLACE ORDER</button>
-                    <button type="button" id="mob-upi-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success">PAY NOW</button>
+                    <button type="submit" id="mob-submit-btn" class="btn btn-orange px-4">PLACE ORDER</button>
+                    <button type="button" id="mob-upi-btn" style="display:none;" onclick="handlePayment()" class="btn btn-success px-4 fw-bold">PAY NOW</button>
                 </div>
             </form>
-            
+
             <div id="upi-confirm-section" style="display:none;" class="alert alert-info mt-3 text-center">
-                <p class="mb-2 small fw-bold">Payment karne ke baad click karein:</p>
+                <p class="mb-2 small fw-bold">Payment complete karne ke baad click karein:</p>
                 <button type="button" onclick="finalizeOrder()" class="btn btn-dark btn-sm w-100">I Have Paid</button>
             </div>
         </div>
 
-        <div class="col-md-5 col-lg-4">
-            <div class="card sticky-summary collapse d-md-block" id="price-summary-box">
+        <div class="col-md-4">
+            <div class="card sticky-top collapse d-md-block" id="price-summary-box" style="top: 80px;">
                 <div class="price-header text-uppercase">Price Details</div>
-                <div class="card-body p-0">
-                    <div class="price-item mt-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
                         <span>Price ({{ cart_items|length|default:"1" }} items)</span>
                         <span>₹{{ total }}</span>
                     </div>
-                    <div class="price-item">
+                    <div class="d-flex justify-content-between mb-3">
                         <span>Delivery Charges</span>
                         <span class="text-success">FREE</span>
                     </div>
-                    <div class="total-amount">
-                        <span>Total Amount</span>
-                        <span class="text-primary">₹{{ grand_total|default:total }}</span>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <h5 class="fw-bold">Total Amount</h5>
+                        <h5 class="fw-bold text-primary">₹{{ grand_total|default:total }}</h5>
                     </div>
                 </div>
             </div>
@@ -133,21 +156,17 @@
 
 <script>
 function togglePaymentUI(method) {
-    const mobOrderBtn = document.getElementById('mob-submit-btn');
-    const mobUpiBtn = document.getElementById('mob-upi-btn');
-    const deskOrderBtn = document.getElementById('desktop-submit-btn');
-    const deskUpiBtn = document.getElementById('desktop-upi-btn');
+    const mobBtn = document.getElementById('mob-submit-btn');
+    const mobUpi = document.getElementById('mob-upi-btn');
+    const deskBtn = document.getElementById('desk-submit-btn');
+    const deskUpi = document.getElementById('desk-upi-btn');
 
     if (method === 'UPI') {
-        mobOrderBtn.style.display = 'none';
-        mobUpiBtn.style.display = 'block';
-        deskOrderBtn.style.display = 'none';
-        deskUpiBtn.style.display = 'block';
+        mobBtn.style.display = 'none'; mobUpi.style.display = 'block';
+        deskBtn.style.display = 'none'; deskUpi.style.display = 'block';
     } else {
-        mobOrderBtn.style.display = 'block';
-        mobUpiBtn.style.display = 'none';
-        deskOrderBtn.style.display = 'block';
-        deskUpiBtn.style.display = 'none';
+        mobBtn.style.display = 'block'; mobUpi.style.display = 'none';
+        deskBtn.style.display = 'block'; deskUpi.style.display = 'none';
     }
 }
 
