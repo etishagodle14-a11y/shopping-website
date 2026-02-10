@@ -1,4 +1,4 @@
-from .models import CartItem
+from .models import CartItem, WishlistItem
 from .models import Category
 
 def category_renderer(request):
@@ -6,9 +6,11 @@ def category_renderer(request):
         'categories': Category.objects.all()
     }
 
-def cart_count(request):
+
+def nav_counts(request):
     if request.user.is_authenticated:
-        count = CartItem.objects.filter(user=request.user).count()
-    else:
-        count = 0
-    return {'cart_count': count}
+        return {
+            'cart_count': CartItem.objects.filter(user=request.user).count(),
+            'wishlist_count': WishlistItem.objects.filter(user=request.user).count(),
+        }
+    return {'cart_count': 0, 'wishlist_count': 0}
