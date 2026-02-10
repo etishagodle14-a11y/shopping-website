@@ -14,7 +14,6 @@
             background-color: #f1f3f6; 
             font-family: Roboto, Arial, sans-serif; 
             margin: 0; 
-            padding-bottom: 20px; 
         }
 
         /* Purple Header Container */
@@ -27,7 +26,17 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Top Row: Logo & Icons */
+        /* Desktop Layout Fixes (Laptop par content center rahega) */
+        @media (min-width: 992px) {
+            .fk-navbar .container {
+                max-width: 1200px;
+            }
+            .search-container {
+                max-width: 600px; /* Search bar zyada lamba nahi hoga */
+                margin: 8px auto !important; /* Center align */
+            }
+        }
+
         .nav-top-row {
             display: flex;
             align-items: center;
@@ -44,12 +53,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Right Side Icons in Header */
-        .header-icons {
-            display: flex;
-            align-items: center;
-        }
-
         .nav-icon-item {
             color: white;
             text-decoration: none;
@@ -61,12 +64,9 @@
             position: relative;
         }
 
-        .nav-icon-item i { 
-            font-size: 18px; 
-            margin-bottom: 2px; 
-        }
+        .nav-icon-item i { font-size: 18px; margin-bottom: 2px; }
 
-        /* Search Bar Structure (Flipkart Style) */
+        /* Search Bar */
         .search-container {
             background: white;
             border-radius: 2px;
@@ -87,7 +87,6 @@
             background: transparent;
         }
 
-        /* Notification Badges */
         .badge-count {
             position: absolute;
             top: -5px;
@@ -100,27 +99,41 @@
             font-weight: bold;
         }
 
-        /* Dropdown for Profile */
-        .user-dropdown-btn {
-            background: #ffffff20;
-            border: none;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-left: 10px;
+        /* Meesho Style Bottom Navigation (Mobile Only) */
+        .meesho-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 2000;
+            border-top: 1px solid #eee;
         }
 
-        /* Alerts Margin */
-        .alert-container {
-            margin-top: 10px;
+        .meesho-nav-item {
+            text-decoration: none;
+            color: #555;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 500;
         }
 
-        /* Layout Fix for Mobile/Desktop */
+        .meesho-nav-item i { font-size: 20px; margin-bottom: 2px; }
+        .meesho-nav-item.active { color: #51295a; }
+
+        /* Responsive Fixes */
         @media (max-width: 768px) {
-            .desktop-nav-text { display: none; } /* Mobile par text hide icon dikhega */
+            .meesho-bottom-nav { display: flex; }
+            body { padding-bottom: 70px; } /* Bottom nav ke liye space */
+            .desktop-nav-text { display: none; } /* Header ke text hide */
             .logo { font-size: 16px; }
+            .header-icons .nav-icon-item:not(.cart-icon) { display: none; } /* Mobile header mein sirf Cart rakhte hain kyunki niche baki options hain */
         }
     </style>
 </head>
@@ -134,47 +147,31 @@
             </a>
             
             <div class="header-icons">
-                <a href="{% url 'offer_zone' %}" class="nav-icon-item">
+                <a href="{% url 'offer_zone' %}" class="nav-icon-item desktop-nav-text">
                     <i class="bi bi-lightning-charge-fill text-warning"></i>
-                    <span class="desktop-nav-text">OFFERS</span>
+                    <span>OFFERS</span>
                 </a>
                 
                 {% if user.is_authenticated %}
-                    <a href="{% url 'my_orders' %}" class="nav-icon-item">
-                        <i class="bi bi-box-seam"></i>
-                        <span class="desktop-nav-text">Orders</span>
-                    </a>
-                    
-                    <a href="{% url 'view_wishlist' %}" class="nav-icon-item">
-                        <i class="bi bi-heart"></i>
-                        <span class="desktop-nav-text">Wishlist</span>
-                        {% if wishlist_count > 0 %}
-                        <span class="badge-count" style="background: #e82351; color: white;">{{ wishlist_count }}</span>
-                        {% endif %}
-                    </a>
-
-                    <a href="{% url 'view_cart' %}" class="nav-icon-item">
+                    <a href="{% url 'view_cart' %}" class="nav-icon-item cart-icon">
                         <i class="bi bi-cart3"></i>
                         <span class="desktop-nav-text">Cart</span>
                         <span class="badge-count">{{ cart_count|default:"0" }}</span>
                     </a>
 
-                    <div class="dropdown">
-                        <button class="user-dropdown-btn dropdown-toggle" data-bs-toggle="dropdown">
+                    <div class="dropdown ms-2">
+                        <button class="btn btn-sm text-white border-0 dropdown-toggle" style="background: rgba(255,255,255,0.1);" data-bs-toggle="dropdown">
                             {{ user.username|truncatechars:5 }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-power text-danger me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'my_orders' %}">My Orders</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                         </ul>
                     </div>
                 {% else %}
                     <a href="{% url 'login' %}" class="nav-icon-item">
                         <i class="bi bi-person-circle"></i>
                         <span class="desktop-nav-text">Login</span>
-                    </a>
-                    <a href="{% url 'view_cart' %}" class="nav-icon-item">
-                        <i class="bi bi-cart3"></i>
-                        <span class="desktop-nav-text">Cart</span>
                     </a>
                 {% endif %}
             </div>
@@ -187,8 +184,27 @@
     </div>
 </header>
 
+<nav class="meesho-bottom-nav">
+    <a href="/" class="meesho-nav-item active">
+        <i class="bi bi-house-door"></i>
+        <span>Home</span>
+    </a>
+    <a href="{% url 'all_products' %}" class="meesho-nav-item">
+        <i class="bi bi-grid"></i>
+        <span>Categories</span>
+    </a>
+    <a href="{% url 'my_orders' %}" class="meesho-nav-item">
+        <i class="bi bi-bag-check"></i>
+        <span>Orders</span>
+    </a>
+    <a href="{% url 'view_wishlist' %}" class="meesho-nav-item">
+        <i class="bi bi-heart"></i>
+        <span>Wishlist</span>
+    </a>
+</nav>
+
 {% if messages %}
-    <div class="container alert-container">
+    <div class="container mt-3">
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
                 {{ message }}
