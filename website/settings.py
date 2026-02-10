@@ -66,7 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'ebook.context_processors.nav_counts',
                 # Yeh line aapko add karni hai:
-                'ebook.context_processors.cart_count', 
+              
                 'ebook.context_processors.category_renderer',
             ],
         }
