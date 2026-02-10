@@ -83,7 +83,7 @@ def product_detail(request, id):
 def category_products(request, slug):
     category = get_object_or_404(Category, slug=slug)
     products = Product.objects.filter(category=category, available=True).order_by('-id')
-    sliders = Slider.objects.all()  # Added to fix missing slider on category pages
+    sliders = Slider.objects.all() 
     categories = Category.objects.all()
 
     return render(request, 'ebook/index.html', {
@@ -190,7 +190,7 @@ def toggle_wishlist(request, product_id):
     return redirect(request.META.get('HTTP_REFERER', 'product_list'))
 
 # ==========================================
-# 3. CHECKOUT & ORDERS
+# 3. CHECKOUT & ORDERS (FIXED)
 # ==========================================
 
 @login_required
@@ -215,21 +215,17 @@ def checkout(request, product_id=None):
     })
 
 @login_required
-def remove_from_checkout(request, item_id):
-    get_object_or_404(CartItem, id=item_id, user=request.user).delete()
-    return redirect('checkout')
-
-@login_required
 def place_order(request):
     if request.method == "POST":
         single_prod_id = request.POST.get('single_product_id')
         payment_method = request.POST.get('payment_method')
-        txn_id = request.POST.get('transaction_id', f"UPI-{uuid.uuid4().hex[:10].upper()}")
-
+        txn_id = request.POST.get('transaction_id')
+        
         # Combine address details
         full_address = f"{request.POST.get('address')}, {request.POST.get('city')}, {request.POST.get('state')} - {request.POST.get('pincode')}"
 
         with transaction.atomic():
+            # Item setup
             if single_prod_id and single_prod_id != "None":
                 product = get_object_or_404(Product, id=single_prod_id)
                 items = [{'product': product, 'quantity': 1, 'price': product.price}]
@@ -244,6 +240,19 @@ def place_order(request):
             delivery_charge = 0 if total_price > 500 else 40
             grand_total = total_price + delivery_charge
 
+            # PAYMENT LOGIC MERGED
+            # Status management
+            if payment_method == 'UPI':
+                if not txn_id:
+                    messages.error(request, "Kripya Transaction ID enter karein!")
+                    return redirect('checkout')
+                status = 'Payment Verifying'
+                msg = "Order place ho gaya! Payment verify hone ke baad confirm hoga."
+            else:
+                status = 'Pending'
+                msg = "Order successfully place ho gaya!"
+
+            # Order creation
             order = Order.objects.create(
                 user=request.user, 
                 order_id=f"ORD{uuid.uuid4().hex[:8].upper()}",
@@ -252,10 +261,11 @@ def place_order(request):
                 full_name=request.POST.get('full_name'), 
                 phone=request.POST.get('phone'),
                 address=full_address,
-                status='Pending' if payment_method == 'COD' else 'Payment Verifying', 
-                transaction_id=txn_id
+                status=status, 
+                transaction_id=txn_id if txn_id else f"COD-{uuid.uuid4().hex[:6].upper()}"
             )
 
+            # Save items and update stock
             for i in items:
                 OrderItem.objects.create(
                     order=order, product=i['product'], price=i['price'], quantity=i['quantity']
@@ -266,7 +276,7 @@ def place_order(request):
             if not single_prod_id or single_prod_id == "None":
                 CartItem.objects.filter(user=request.user).delete()
 
-            messages.success(request, "Order successfully place ho gaya!")
+            messages.success(request, msg)
             return redirect('order_success', order_id=order.order_id)
             
     return redirect('checkout')
@@ -288,12 +298,13 @@ def track_order(request, order_id):
 @login_required
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, order_id=order_id, user=request.user)
-    if order.status == 'Pending':
+    if order.status in ['Pending', 'Payment Verifying']:
         for item in order.items.all():
             item.product.stock += item.quantity
             item.product.save()
         order.status = 'Cancelled'
         order.save()
+        messages.info(request, "Order cancel kar diya gaya hai.")
     return redirect('my_orders')
 
 # ==========================================

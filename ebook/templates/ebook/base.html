@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
-        body { background-color: #f1f3f6; font-family: Arial, sans-serif; padding-bottom: 60px; } 
+        /* General Styles */
+        body { background-color: #c7b2d3ff; font-family: Arial, sans-serif; padding-bottom: 60px; } 
         
         /* Purple Navbar (#51295a) */
         .fk-navbar { 
@@ -79,20 +80,22 @@
 
         .mobile-nav-item i { font-size: 20px; }
 
-        /* Mobile Fixes */
+        /* ========================================== */
+        /* MOBILE OPTIMIZATION (MERGED)              */
+        /* ========================================== */
         @media (max-width: 768px) {
             .fk-navbar .container {
                 flex-direction: column !important; 
-                padding: 5px !important;
+                padding: 10px !important;
             }
             .logo {
-                margin-bottom: 10px !important;
+                margin-bottom: 5px !important;
                 font-size: 18px !important;
                 text-align: center !important;
                 width: 100% !important;
             }
             .search-box {
-                margin: 0 !important;
+                margin: 10px 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 order: 2; 
@@ -126,7 +129,7 @@
                 <a href="{% url 'view_wishlist' %}" class="nav-link-custom position-relative">
                     <i class="bi bi-heart"></i> Wishlist
                     {% if wishlist_count > 0 %}
-                    <span class="badge-notify" style="background: #ff3f6c; color: white;">{{ wishlist_count }}</span>
+                    <span class="badge-notify" style="background: #e82351ff; color: white;">{{ wishlist_count }}</span>
                     {% endif %}
                 </a>
                 <a href="{% url 'view_cart' %}" class="nav-link-custom position-relative ms-4">
