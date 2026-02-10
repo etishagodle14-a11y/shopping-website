@@ -25,7 +25,7 @@
             color: var(--text-main);
         }
         
-        /* Navbar - Slate Dark */
+        /* --- Navbar Styles --- */
         .fk-navbar { 
             background-color: var(--slate-dark); 
             padding: 12px 0; 
@@ -36,12 +36,16 @@
         }
         .header-flex { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         
+        /* Logo Fix: Clean text, no extra icon */
         .logo { 
-            font-size: 24px; 
+            font-size: 26px; 
             font-weight: 900; 
             color: white; 
             text-decoration: none; 
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
             min-width: 160px;
         }
         .logo span { color: var(--rose-action); }
@@ -88,20 +92,53 @@
         .nav-icon-item:hover { color: white; }
         .nav-icon-item i { font-size: 22px; display: block; margin-bottom: 2px; }
 
-        /* Rose Button Styling */
-        .btn-orange, .btn-primary, .btn-rose {
-            background-color: var(--rose-action) !important; 
-            border: none;
-            border-radius: 4px;
-            padding: 10px 24px;
-            transition: 0.3s;
-            color: white !important;
-            font-weight: 600;
-            font-size: 14px;
+        /* --- Offer Section Styling --- */
+        .offer-item {
+            background: #fdf1f3; 
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--rose-action);
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            transition: transform 0.2s;
         }
-        .btn-orange:hover, .btn-primary:hover {
+        .offer-item:hover { transform: translateX(5px); }
+        .offer-icon { color: var(--rose-action); font-size: 1.25rem; }
+        .offer-text { font-size: 14px; color: #444; line-height: 1.5; }
+
+        /* --- Stylish Button Classes --- */
+        .btn-rose, .btn-outline-rose {
+            transition: all 0.3s ease;
+            border-radius: 8px !important; 
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            padding: 10px 24px;
+        }
+
+        .btn-rose {
+            background-color: var(--rose-action) !important;
+            border: none;
+            color: white !important;
+        }
+
+        .btn-rose:hover {
             background-color: var(--rose-hover) !important;
-            box-shadow: 0 4px 12px rgba(239, 87, 119, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(239, 87, 119, 0.4) !important;
+        }
+
+        .btn-outline-rose {
+            border: 2px solid var(--rose-action) !important;
+            color: var(--rose-action) !important;
+            background: transparent;
+        }
+
+        .btn-outline-rose:hover {
+            background-color: var(--rose-action) !important;
+            color: white !important;
+            transform: translateY(-3px);
         }
 
         /* Mobile View */
@@ -109,11 +146,10 @@
             .header-icons { display: none; } 
             .bottom-nav { display: flex !important; }
             body { padding-bottom: 70px !important; } 
-            .logo { font-size: 20px; min-width: auto; }
-            .search-container { margin: 5px 10px; border-radius: 4px; }
+            .logo { font-size: 22px; min-width: auto; }
+            .search-container { margin: 5px 10px; }
         }
 
-        /* Bottom Nav */
         .bottom-nav { 
             position: fixed; bottom: 0; width: 100%; 
             background: #ffffff;
@@ -122,7 +158,7 @@
             height: 65px;
             border-top: 1px solid #f1f2f6;
         }
-        .bottom-nav-item { text-decoration: none; color: #747d8c; font-size: 11px; text-align: center; flex: 1; transition: 0.3s; }
+        .bottom-nav-item { text-decoration: none; color: #747d8c; font-size: 11px; text-align: center; flex: 1; }
         .bottom-nav-item i { font-size: 22px; display: block; }
         .bottom-nav-item.active { color: var(--rose-action); font-weight: bold; }
 
@@ -173,8 +209,9 @@
     <a href="{% url 'login' %}" class="bottom-nav-item"><i class="bi bi-person"></i>Account</a>
 </nav>
 
-<div class="main-body">
-    {% block content %}{% endblock %}
+<div class="main-body container mt-4">
+    {% block content %}
+    {% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
