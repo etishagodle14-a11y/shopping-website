@@ -32,11 +32,11 @@
                     </div>
                     <div class="col-md-3 d-none d-md-block text-center">
                         <p class="text-muted mb-0 small text-uppercase">Total Amount</p>
-                        <p class="fw-bold mb-0 text-rose" style="font-size: 14px;">₹{{ order.amount|default:order.total_price }}</p>
+                        <p class="fw-bold mb-0 text-rose" style="font-size: 14px;">₹{{ order.amount }}</p>
                     </div>
                     <div class="col-md-3 col-6 text-md-center text-end">
                         <p class="text-muted mb-0 small text-uppercase">Order ID</p>
-                        <p class="fw-bold mb-0" style="font-size: 14px;">#{{ order.order_id|default:order.id }}</p>
+                        <p class="fw-bold mb-0" style="font-size: 14px;">#{{ order.order_id }}</p>
                     </div>
                     <div class="col-md-3 d-none d-md-block text-end">
                         <a href="{% url 'track_order' order.order_id %}" class="btn btn-light btn-sm border fw-bold px-3">DETAILS</a>
@@ -97,7 +97,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body py-4 text-center">
-                        <p class="mb-0">Aap Order <strong>#{{ order.order_id|default:order.id }}</strong> ko cancel kar rahe hain. <br>Kya aap pakka sure hain?</p>
+                        <p class="mb-0">Aap Order <strong>#{{ order.order_id }}</strong> ko cancel kar rahe hain. <br>Kya aap pakka sure hain?</p>
                     </div>
                     <div class="modal-footer border-0 justify-content-center">
                         <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">NAHI, BACK</button>
