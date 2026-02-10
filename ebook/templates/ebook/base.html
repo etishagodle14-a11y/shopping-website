@@ -9,187 +9,193 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
-        /* General Styles */
-        body { background-color: #c7b2d3ff; font-family: Arial, sans-serif; padding-bottom: 60px; } 
-        
-        /* Purple Navbar (#51295a) */
+        /* General Body Settings */
+        body { 
+            background-color: #f1f3f6; 
+            font-family: Roboto, Arial, sans-serif; 
+            margin: 0; 
+            padding-bottom: 20px; 
+        }
+
+        /* Purple Header Container */
         .fk-navbar { 
             background-color: #51295a; 
-            padding: 10px 0; 
-            color: white; 
+            padding: 8px 12px; 
             position: sticky; 
             top: 0; 
-            z-index: 1000; 
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .logo { font-size: 20px; font-weight: 800; color: white; text-decoration: none; font-style: italic; white-space: nowrap; }
-        
-        /* Search Box Styling */
-        .search-box { background: white; border-radius: 4px; display: flex; width: 100%; margin: 0 15px; }
-        .search-input { border: none; padding: 6px 12px; width: 100%; outline: none; font-size: 14px; border-radius: 4px 0 0 4px; }
-        
-        /* Nav Links (Desktop) */
-        .nav-link-custom { 
+
+        /* Top Row: Logo & Icons */
+        .nav-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .logo { 
+            font-size: 18px; 
+            font-weight: 800; 
             color: white; 
             text-decoration: none; 
-            font-size: 14px; 
-            font-weight: 500; 
-            margin-left: 18px; 
-            transition: 0.2s; 
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+
+        /* Right Side Icons in Header */
+        .header-icons {
             display: flex;
             align-items: center;
         }
-        .nav-link-custom i { margin-right: 5px; font-size: 18px; }
-        .nav-link-custom:hover { color: #ffc107; }
+
+        .nav-icon-item {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            margin-left: 15px;
+            position: relative;
+        }
+
+        .nav-icon-item i { 
+            font-size: 18px; 
+            margin-bottom: 2px; 
+        }
+
+        /* Search Bar Structure (Flipkart Style) */
+        .search-container {
+            background: white;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            padding: 0 10px;
+            height: 38px;
+            width: 100%;
+        }
+        
+        .search-input {
+            border: none;
+            padding: 8px;
+            width: 100%;
+            outline: none;
+            font-size: 14px;
+            background: transparent;
+        }
 
         /* Notification Badges */
-        .badge-notify {
+        .badge-count {
             position: absolute;
             top: -5px;
-            right: -10px;
-            font-size: 10px;
-            padding: 2px 6px;
+            right: -8px;
+            font-size: 9px;
+            padding: 2px 5px;
+            background-color: #ffc107;
+            color: black;
             border-radius: 50%;
             font-weight: bold;
         }
 
-        /* Mobile Bottom Navigation */
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1001;
-            padding: 8px 0;
-            justify-content: space-around;
+        /* Dropdown for Profile */
+        .user-dropdown-btn {
+            background: #ffffff20;
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
         }
 
-        .mobile-nav-item {
-            text-decoration: none;
-            color: #51295a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 500;
-            position: relative;
+        /* Alerts Margin */
+        .alert-container {
+            margin-top: 10px;
         }
 
-        .mobile-nav-item i { font-size: 20px; }
-
-        /* ========================================== */
-        /* MOBILE OPTIMIZATION (MERGED)              */
-        /* ========================================== */
+        /* Layout Fix for Mobile/Desktop */
         @media (max-width: 768px) {
-            .fk-navbar .container {
-                flex-direction: column !important; 
-                padding: 10px !important;
-            }
-            .logo {
-                margin-bottom: 5px !important;
-                font-size: 18px !important;
-                text-align: center !important;
-                width: 100% !important;
-            }
-            .search-box {
-                margin: 10px 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                order: 2; 
-            }
-            .desktop-nav {
-                display: none !important; 
-            }
-            .mobile-nav {
-                display: flex !important; 
-            }
-            .fk-navbar { padding: 8px 0; }
+            .desktop-nav-text { display: none; } /* Mobile par text hide icon dikhega */
+            .logo { font-size: 16px; }
         }
     </style>
 </head>
 <body>
 
 <header class="fk-navbar">
-    <div class="container d-flex align-items-center">
-        <a href="/" class="logo">APNA MART <i class="bi bi-gift-fill" style="font-size: 12px;"></i></a>
-
-        <form action="{% url 'all_products' %}" method="GET" class="search-box">
-            <input type="text" name="q" class="search-input" placeholder="Search products..." value="{{ request.GET.q|default:'' }}">
-            <button type="submit" class="btn btn-white border-0"><i class="bi bi-search text-dark"></i></button>
-        </form>
-
-        <div class="d-flex align-items-center desktop-nav">
-            <a href="{% url 'offer_zone' %}" class="nav-link-custom text-warning"><i class="bi bi-lightning-fill"></i> OFFERS</a>
+    <div class="container p-0">
+        <div class="nav-top-row">
+            <a href="/" class="logo">
+                APNA MART <i class="bi bi-gift-fill" style="font-size: 12px;"></i>
+            </a>
             
-            {% if user.is_authenticated %}
-                <a href="{% url 'my_orders' %}" class="nav-link-custom"><i class="bi bi-box-seam"></i> Orders</a>
-                <a href="{% url 'view_wishlist' %}" class="nav-link-custom position-relative">
-                    <i class="bi bi-heart"></i> Wishlist
-                    {% if wishlist_count > 0 %}
-                    <span class="badge-notify" style="background: #e82351ff; color: white;">{{ wishlist_count }}</span>
-                    {% endif %}
+            <div class="header-icons">
+                <a href="{% url 'offer_zone' %}" class="nav-icon-item">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i>
+                    <span class="desktop-nav-text">OFFERS</span>
                 </a>
-                <a href="{% url 'view_cart' %}" class="nav-link-custom position-relative ms-4">
-                    <i class="bi bi-cart3"></i> Cart 
-                    <span class="badge-notify" style="background: #ffc107; color: black;">{{ cart_count|default:"0" }}</span>
-                </a>
-                <div class="dropdown ms-4">
-                    <button class="btn btn-light btn-sm dropdown-toggle fw-bold" data-bs-toggle="dropdown">
-                        {{ user.username|truncatechars:8 }}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
-                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-power text-danger me-2"></i>Logout</a></li>
-                    </ul>
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-light btn-sm fw-bold ms-4 px-3">Login</a>
-                <a href="{% url 'view_cart' %}" class="nav-link-custom position-relative ms-4">
-                    <i class="bi bi-cart3"></i> Cart 
-                </a>
-            {% endif %}
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'my_orders' %}" class="nav-icon-item">
+                        <i class="bi bi-box-seam"></i>
+                        <span class="desktop-nav-text">Orders</span>
+                    </a>
+                    
+                    <a href="{% url 'view_wishlist' %}" class="nav-icon-item">
+                        <i class="bi bi-heart"></i>
+                        <span class="desktop-nav-text">Wishlist</span>
+                        {% if wishlist_count > 0 %}
+                        <span class="badge-count" style="background: #e82351; color: white;">{{ wishlist_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{% url 'view_cart' %}" class="nav-icon-item">
+                        <i class="bi bi-cart3"></i>
+                        <span class="desktop-nav-text">Cart</span>
+                        <span class="badge-count">{{ cart_count|default:"0" }}</span>
+                    </a>
+
+                    <div class="dropdown">
+                        <button class="user-dropdown-btn dropdown-toggle" data-bs-toggle="dropdown">
+                            {{ user.username|truncatechars:5 }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-power text-danger me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-icon-item">
+                        <i class="bi bi-person-circle"></i>
+                        <span class="desktop-nav-text">Login</span>
+                    </a>
+                    <a href="{% url 'view_cart' %}" class="nav-icon-item">
+                        <i class="bi bi-cart3"></i>
+                        <span class="desktop-nav-text">Cart</span>
+                    </a>
+                {% endif %}
+            </div>
         </div>
+
+        <form action="{% url 'all_products' %}" method="GET" class="search-container">
+            <input type="text" name="q" class="search-input" placeholder="Search for products, brands and more" value="{{ request.GET.q|default:'' }}">
+            <button type="submit" class="btn p-0 border-0"><i class="bi bi-search text-muted"></i></button>
+        </form>
     </div>
 </header>
 
-<nav class="mobile-nav">
-    <a href="/" class="mobile-nav-item">
-        <i class="bi bi-house"></i>
-        <span>Home</span>
-    </a>
-    <a href="{% url 'offer_zone' %}" class="mobile-nav-item">
-        <i class="bi bi-lightning"></i>
-        <span>Offers</span>
-    </a>
-    <a href="{% url 'my_orders' %}" class="mobile-nav-item">
-        <i class="bi bi-box-seam"></i>
-        <span>Orders</span>
-    </a>
-    <a href="{% url 'view_wishlist' %}" class="mobile-nav-item">
-        <i class="bi bi-heart"></i>
-        <span>Wishlist</span>
-        {% if wishlist_count > 0 %}<span class="badge bg-danger rounded-pill badge-notify">{{ wishlist_count }}</span>{% endif %}
-    </a>
-    <a href="{% url 'view_cart' %}" class="mobile-nav-item">
-        <i class="bi bi-cart3"></i>
-        <span>Cart</span>
-        <span class="badge bg-warning text-dark rounded-pill badge-notify">{{ cart_count|default:"0" }}</span>
-    </a>
-</nav>
-
-{% if not 'checkout' in request.path %}
-    {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+{% if messages %}
+    <div class="container alert-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
 {% endif %}
 
 <div class="main-body">
