@@ -4,103 +4,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apna Mart</title>
+    <title>Apna Mart | Premium Shopping</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
         :root {
-            /* Midnight Rose Palette */
             --slate-dark: #2D142C;    
             --rose-action: #EE4540;   
             --rose-hover: #C72C41; 
-            --bg-body: #f8f9fa;
-            --text-main: #2D142C;
+            --bg-body: #f0f2f5; /* Thoda greyish-white background jo products ko highlight karega */
+            --white: #ffffff;
         }
 
         body { 
             background-color: var(--bg-body); 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding-bottom: 60px; /* Mobile bottom nav ke liye space */
         }
-        
-        /* Navbar */
+
+        /* Navbar Core */
         .fk-navbar { 
             background-color: var(--slate-dark); 
             padding: 10px 0; 
             position: sticky; 
             top: 0; 
-            z-index: 1000; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            z-index: 1050; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .header-flex { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-        
+
         .logo { 
-            font-size: 24px; 
-            font-weight: 900; 
-            color: white; 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: var(--white); 
             text-decoration: none; 
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
         }
         .logo span { color: var(--rose-action); }
 
+        /* Search Bar Styling */
+        .search-wrapper {
+            background-color: var(--slate-dark);
+            padding-bottom: 10px;
+        }
         .search-container { 
-            background: #ffffff; 
+            background: var(--white); 
             border-radius: 6px; 
             display: flex; 
             align-items: center; 
-            padding: 0 15px; 
-            height: 40px; 
-            flex-grow: 1; 
-            max-width: 500px; 
-            border: 1px solid #dcdde1;
+            padding: 0 12px; 
+            height: 38px;
+            width: 100%;
         }
-        .search-input { border: none; background: transparent; width: 100%; outline: none; font-size: 14px; }
+        .search-input { border: none; background: transparent; width: 100%; outline: none; font-size: 14px; color: #333; }
 
-        .nav-icon-item { 
-            color: #ced4da; 
-            text-decoration: none; 
-            text-align: center; 
-            font-size: 12px; 
-            position: relative; 
-            transition: 0.2s;
+        /* Icon Items */
+        .nav-icon-link {
+            color: var(--white);
+            text-decoration: none;
+            position: relative;
+            font-size: 20px;
+        }
+        .badge-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: var(--rose-action);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* Bottom Navigation (Mobile Only) */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
-        .nav-icon-item:hover { color: white; }
-        .nav-icon-item i { font-size: 20px; display: block; }
-
-        .badge-notify {
-            position: absolute; top: -5px; right: -5px; 
-            background-color: var(--rose-action); color: white; 
-            font-size: 10px; padding: 2px 5px; 
-            border-radius: 20px; border: 2px solid var(--slate-dark);
+        .mobile-nav-item {
+            text-decoration: none;
+            color: #555;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 500;
         }
+        .mobile-nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+        .mobile-nav-item.active { color: var(--rose-action); }
 
-        .btn-rose {
-            background-color: var(--rose-action) !important;
-            color: white !important;
-            border: none;
-        }
-
-        /* Mobile Bottom Nav */
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; 
-            background: #ffffff;
-            display: none; justify-content: space-around; padding: 10px 0; 
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 3000; 
-            border-top: 1px solid #f1f2f6;
-        }
-        .bottom-nav-item { text-decoration: none; color: #747d8c; font-size: 11px; text-align: center; flex: 1; position: relative; }
-        .bottom-nav-item i { font-size: 22px; display: block; }
-        .bottom-nav-item.active { color: var(--rose-action); font-weight: bold; }
-
-        @media (max-width: 991px) {
-            .header-icons { display: none !important; }
-            .bottom-nav { display: flex !important; }
-            body { padding-bottom: 70px !important; }
+        @media (min-width: 992px) {
+            .mobile-nav { display: none; }
+            .logo { font-size: 26px; }
+            body { padding-bottom: 0; }
         }
     </style>
 </head>
@@ -108,44 +112,65 @@
 
 <header class="fk-navbar">
     <div class="container">
-        <div class="header-flex">
+        <div class="d-flex align-items-center justify-content-between">
             <a href="/" class="logo">APNA<span>MART</span></a>
-            
-            <form action="{% url 'all_products' %}" method="GET" class="search-container d-none d-md-flex">
-                <input type="text" name="q" class="search-input" placeholder="Search products...">
-                <i class="bi bi-search text-muted"></i>
-            </form>
 
-            <div class="header-icons d-flex align-items-center gap-4">
-                <a href="{% url 'view_cart' %}" class="nav-icon-item">
-                    <i class="bi bi-bag"></i>
-                    {% if cart_count > 0 %}<span class="badge-notify">{{ cart_count }}</span>{% endif %}
-                    Cart
+            <div class="d-flex align-items-center gap-3">
+                <a href="{% url 'wishlist' %}" class="nav-icon-link">
+                    <i class="bi bi-heart"></i>
+                    {% if wishlist_count > 0 %}<span class="badge-count">{{ wishlist_count }}</span>{% endif %}
                 </a>
+                
                 {% if user.is_authenticated %}
-                    <a href="{% url 'my_orders' %}" class="nav-icon-item"><i class="bi bi-truck"></i>Orders</a>
-                    <a href="{% url 'logout' %}" class="nav-icon-item text-danger"><i class="bi bi-power"></i>Logout</a>
+                    <a href="{% url 'logout' %}" class="nav-icon-link text-danger"><i class="bi bi-power"></i></a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="nav-icon-item" style="color: var(--rose-action);"><i class="bi bi-person"></i>Login</a>
+                    <a href="{% url 'login' %}" class="nav-icon-link"><i class="bi bi-person-circle"></i></a>
                 {% endif %}
+                
+                <a href="{% url 'view_cart' %}" class="nav-icon-link d-none d-md-block">
+                    <i class="bi bi-bag"></i>
+                    {% if cart_count > 0 %}<span class="badge-count">{{ cart_count }}</span>{% endif %}
+                </a>
             </div>
         </div>
     </div>
 </header>
 
-<div class="main-body container mt-4">
+<div class="search-wrapper">
+    <div class="container">
+        <form action="{% url 'all_products' %}" method="GET" class="search-container">
+            <i class="bi bi-search text-muted me-2"></i>
+            <input type="text" name="q" class="search-input" placeholder="Search for products...">
+        </form>
+    </div>
+</div>
+
+<div class="main-body mt-3">
     {% block content %}{% endblock %}
 </div>
 
-<nav class="bottom-nav">
-    <a href="/" class="bottom-nav-item"><i class="bi bi-house"></i>Home</a>
-    <a href="{% url 'all_products' %}" class="bottom-nav-item"><i class="bi bi-grid"></i>Shop</a>
-    <a href="{% url 'view_cart' %}" class="bottom-nav-item">
-        <i class="bi bi-bag"></i>
-        {% if cart_count > 0 %}<span class="badge-notify">{{ cart_count }}</span>{% endif %}
-        Cart
+<nav class="mobile-nav d-lg-none">
+    <a href="/" class="mobile-nav-item active">
+        <i class="bi bi-house-door"></i>
+        <span>Home</span>
     </a>
-    <a href="{% url 'my_orders' %}" class="bottom-nav-item"><i class="bi bi-truck"></i>Orders</a>
+    <a href="{% url 'all_products' %}?mode=categories" class="mobile-nav-item">
+        <i class="bi bi-grid"></i>
+        <span>Categories</span>
+    </a>
+    <a href="{% url 'offer_zone' %}" class="mobile-nav-item">
+        <i class="bi bi-lightning-charge"></i>
+        <span>Offers</span>
+    </a>
+    <a href="{% url 'view_cart' %}" class="mobile-nav-item">
+        <i class="bi bi-bag"></i>
+        {% if cart_count > 0 %}<span class="badge-count" style="top: 2px; right: 20%;">{{ cart_count }}</span>{% endif %}
+        <span>Cart</span>
+    </a>
+    <a href="{% url 'my_orders' %}" class="mobile-nav-item">
+        <i class="bi bi-truck"></i>
+        <span>Orders</span>
+    </a>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
