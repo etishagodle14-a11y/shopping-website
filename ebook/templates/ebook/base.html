@@ -10,12 +10,12 @@
     
     <style>
         :root {
-    --slate-dark: #765D69;   /* Navbar ke liye (Dark Slate) */
-    --rose-action: #F1828D;  /* Buttons aur Icons ke liye (Dusky Rose) */
-    --bg-body: #FEFAD4;      /* Pure page ka background (Creamy) */
-    --teal-accent: #8FB9A8;  /* Secondary elements ke liye */
-    --text-main: #2F3542;
-
+            /* Midnight Rose Palette */
+            --slate-dark: #2D142C;    
+            --rose-action: #EE4540;   
+            --rose-hover: #C72C41; 
+            --bg-body: #f8f9fa;
+            --text-main: #2D142C;
         }
 
         body { 
@@ -25,7 +25,7 @@
             color: var(--text-main);
         }
         
-        /* Navbar Core */
+        /* Navbar */
         .fk-navbar { 
             background-color: var(--slate-dark); 
             padding: 10px 0; 
@@ -45,7 +45,6 @@
         }
         .logo span { color: var(--rose-action); }
 
-        /* Search Bar */
         .search-container { 
             background: #ffffff; 
             border-radius: 6px; 
@@ -59,7 +58,6 @@
         }
         .search-input { border: none; background: transparent; width: 100%; outline: none; font-size: 14px; }
 
-        /* Nav Icons */
         .nav-icon-item { 
             color: #ced4da; 
             text-decoration: none; 
@@ -81,15 +79,13 @@
             border-radius: 20px; border: 2px solid var(--slate-dark);
         }
 
-        /* Mobile Adjustments */
-        @media (max-width: 991px) {
-            .header-icons { display: none !important; }
-            .logo { font-size: 18px; }
-            .bottom-nav { display: flex !important; }
-            body { padding-bottom: 70px !important; }
+        .btn-rose {
+            background-color: var(--rose-action) !important;
+            color: white !important;
+            border: none;
         }
 
-        /* Bottom Navigation Mobile */
+        /* Mobile Bottom Nav */
         .bottom-nav { 
             position: fixed; bottom: 0; width: 100%; 
             background: #ffffff;
@@ -101,6 +97,11 @@
         .bottom-nav-item i { font-size: 22px; display: block; }
         .bottom-nav-item.active { color: var(--rose-action); font-weight: bold; }
 
+        @media (max-width: 991px) {
+            .header-icons { display: none !important; }
+            .bottom-nav { display: flex !important; }
+            body { padding-bottom: 70px !important; }
+        }
     </style>
 </head>
 <body>
@@ -111,88 +112,42 @@
             <a href="/" class="logo">APNA<span>MART</span></a>
             
             <form action="{% url 'all_products' %}" method="GET" class="search-container d-none d-md-flex">
-                <input type="text" name="q" class="search-input" placeholder="Search for premium products...">
+                <input type="text" name="q" class="search-input" placeholder="Search products...">
                 <i class="bi bi-search text-muted"></i>
             </form>
 
-            <div class="header-icons-wrapper d-flex align-items-center gap-2">
-                
-                <div class="d-md-none d-flex align-items-center gap-3">
-                    <a href="{% url 'all_products' %}" class="nav-icon-item">
-                        <i class="bi bi-search" style="color: white; font-size: 20px;"></i>
-                    </a>
-
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'my_orders' %}" class="nav-icon-item">
-                            <i class="bi bi-person-circle" style="color: var(--rose-action); font-size: 24px;"></i>
-                            <span style="font-size: 9px; display: block; color: white;">Orders</span>
-                        </a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="nav-icon-item">
-                            <i class="bi bi-box-arrow-in-right" style="color: white; font-size: 24px;"></i>
-                            <span style="font-size: 9px; display: block; color: white;">Login</span>
-                        </a>
-                    {% endif %}
-                </div>
-
-                <div class="header-icons d-none d-md-flex align-items-center gap-4">
-                    <a href="{% url 'offer_zone' %}" class="nav-icon-item"><i class="bi bi-tags"></i>Offers</a>
-                    <a href="{% url 'wishlist' %}" class="nav-icon-item">
-                        <i class="bi bi-heart"></i>
-                        {% if wishlist_count > 0 %}<span class="badge-notify">{{ wishlist_count }}</span>{% endif %}
-                        Wishlist
-                    </a>
-                    <a href="{% url 'view_cart' %}" class="nav-icon-item">
-                        <i class="bi bi-bag"></i>
-                        {% if cart_count > 0 %}<span class="badge-notify">{{ cart_count }}</span>{% endif %}
-                        Cart
-                    </a>
+            <div class="header-icons d-flex align-items-center gap-4">
+                <a href="{% url 'view_cart' %}" class="nav-icon-item">
+                    <i class="bi bi-bag"></i>
+                    {% if cart_count > 0 %}<span class="badge-notify">{{ cart_count }}</span>{% endif %}
+                    Cart
+                </a>
+                {% if user.is_authenticated %}
                     <a href="{% url 'my_orders' %}" class="nav-icon-item"><i class="bi bi-truck"></i>Orders</a>
-                    
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'logout' %}" class="nav-icon-item text-danger">
-                            <i class="bi bi-power"></i>
-                            Logout
-                        </a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="nav-icon-item" style="color: var(--rose-action);">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            Login
-                        </a>
-                    {% endif %}
-                </div>
+                    <a href="{% url 'logout' %}" class="nav-icon-item text-danger"><i class="bi bi-power"></i>Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-icon-item" style="color: var(--rose-action);"><i class="bi bi-person"></i>Login</a>
+                {% endif %}
             </div>
         </div>
     </div>
 </header>
 
+<div class="main-body container mt-4">
+    {% block content %}{% endblock %}
+</div>
+
 <nav class="bottom-nav">
     <a href="/" class="bottom-nav-item"><i class="bi bi-house"></i>Home</a>
-    <a href="{% url 'all_products' %}?mode=categories" class="bottom-nav-item"><i class="bi bi-grid"></i>Categories</a>
-    <a href="{% url 'offer_zone' %}" class="bottom-nav-item"><i class="bi bi-tags"></i>Offers</a>
+    <a href="{% url 'all_products' %}" class="bottom-nav-item"><i class="bi bi-grid"></i>Shop</a>
     <a href="{% url 'view_cart' %}" class="bottom-nav-item">
         <i class="bi bi-bag"></i>
-        {% if cart_count > 0 %}<span class="badge-notify" style="top: 2px; right: 25%;">{{ cart_count }}</span>{% endif %}
+        {% if cart_count > 0 %}<span class="badge-notify">{{ cart_count }}</span>{% endif %}
         Cart
     </a>
     <a href="{% url 'my_orders' %}" class="bottom-nav-item"><i class="bi bi-truck"></i>Orders</a>
 </nav>
 
-<div class="main-body container mt-4">
-    {% block content %}{% endblock %}
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    // URL highlight for mobile nav
-    const currentUrl = window.location.href;
-    document.querySelectorAll('.bottom-nav-item').forEach(link => {
-        if(currentUrl.includes(link.href) && link.href.length > window.location.origin.length + 1){
-            link.classList.add('active');
-        }
-    });
-</script>
-
 </body>
 </html>
