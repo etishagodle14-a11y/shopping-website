@@ -1,35 +1,31 @@
-{% extends 'ebook/base.html' %}
-
+{% extends 'base.html' %}
 {% block content %}
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow-lg border-0 p-4 p-md-5" style="border-radius: 20px;">
+            <div class="signup-card shadow-lg border-0 p-4 p-md-5">
                 <div class="text-center mb-4">
-                    <div class="d-inline-block p-3 rounded-circle mb-2" style="background-color: #60367c11;">
-                        <i class="bi bi-person-plus-fill fs-2" style="color: #60377cff;"></i>
+                    <div class="icon-circle mb-2">
+                        <i class="bi bi-person-plus-fill fs-2"></i>
                     </div>
-                    <h3 class="fw-bold" style="color: #60377cff;">Join Apna Mart</h3>
-                    <p class="text-muted small">Apna account banayein aur shopping shuru karein</p>
+                    <h3 class="fw-bold theme-text">Naya Account</h3>
+                    <p class="text-muted small">Apna Mart par shopping shuru karein</p>
                 </div>
                 
                 <form method="POST" novalidate>
                     {% csrf_token %}
-                    
                     {% for field in form %}
-                        <div class="mb-3 position-relative">
+                        <div class="mb-3">
                             <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">
                                 {{ field.label }}
                             </label>
-                            
                             {{ field }}
-                            
                             {% if field.help_text %}
-                                <div class="form-text mt-1 text-muted" style="font-size: 0.75rem;">
+                                <div class="form-text text-muted" style="font-size: 0.75rem;">
                                     {{ field.help_text|safe }}
                                 </div>
                             {% endif %}
-
                             {% for error in field.errors %}
                                 <div class="text-danger fw-bold mt-1" style="font-size: 0.75rem;">
                                     <i class="bi bi-exclamation-circle-fill"></i> {{ error }}
@@ -39,15 +35,15 @@
                     {% endfor %}
 
                     <div class="d-grid mt-4">
-                        <button type="submit" class="btn text-white fw-bold py-2 shadow-sm signup-btn">
-                            CREATE ACCOUNT
+                        <button type="submit" class="btn btn-signup text-white fw-bold py-2 shadow-sm">
+                            REGISTER KAREIN
                         </button>
                     </div>
                 </form>
 
                 <div class="text-center mt-4">
                     <span class="text-muted small">Pehle se account hai?</span>
-                    <a href="{% url 'login' %}" class="text-decoration-none fw-bold ms-1" style="color: #60367c;">Login Karein</a>
+                    <a href="{% url 'login' %}" class="login-link ms-1">Login Karein</a>
                 </div>
             </div>
         </div>
@@ -55,46 +51,61 @@
 </div>
 
 <style>
-    body { background-color: #60367c88; }
+    /* Global Background matching your theme */
+    body { background-color: #f8f9fa; }
 
-    /* Customizing Django-generated inputs */
-    input[type="text"], input[type="password"], input[type="email"], select, textarea { 
+    .signup-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border-top: 5px solid #EE4540 !important; /* Rose Accent */
+    }
+
+    .icon-circle {
+        display: inline-block;
+        padding: 15px;
+        border-radius: 50%;
+        background-color: rgba(238, 69, 64, 0.1);
+        color: #EE4540;
+    }
+
+    .theme-text { color: #2D142C; }
+
+    /* Customizing Django Inputs */
+    input[type="text"], input[type="password"], input[type="email"] { 
         width: 100%; 
         padding: 12px 15px; 
-        border: 2px solid #C72C41;; 
+        border: 1.5px solid #eee; 
         border-radius: 10px; 
-        transition: all 0.3s ease;
-        background-color: #C72C41;d;
-        font-size: 0.95rem;
+        transition: 0.3s;
+        background-color: #fcfcfc;
     }
     
     input:focus {
-        border-color: #60367c88 !important;
+        border-color: #EE4540 !important;
         background-color: #fff;
-        box-shadow: 0 0 0 0.25rem rgba(96, 54, 124, 0.1) !important;
+        box-shadow: 0 0 0 0.25rem rgba(238, 69, 64, 0.1) !important;
         outline: none;
     }
 
-    .signup-btn {
-        background: linear-gradient(45deg, #2D142C, #8a3987ff;
+    .btn-signup {
+        background: #EE4540;
         border: none;
         border-radius: 10px;
         transition: 0.3s;
     }
 
-    .signup-btn:hover {
+    .btn-signup:hover {
+        background: #C72C41;
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(96, 54, 124, 0.3);
-        opacity: 0.9;
+    }
+
+    .login-link {
+        color: #EE4540;
+        font-weight: bold;
+        text-decoration: none;
     }
 
     .tracking-wider { letter-spacing: 0.8px; }
-
-    /* Django default helptext list styling */
-    .form-text ul {
-        list-style: none;
-        padding-left: 0;
-        margin-bottom: 0;
-    }
 </style>
+
 {% endblock %}
